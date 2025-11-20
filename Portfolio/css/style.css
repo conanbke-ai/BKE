@@ -1,0 +1,1354 @@
+/* ====================================================================
+    0. Variables & Reset
+    ==================================================================== */
+
+:root {
+  /* Color Palette - Light Mode (Professional & Calm) */
+  --primary: #1976d2; /* Strong Blue (강조색) */
+  --primary-light: #64b5f6;
+  --primary-dark: #1565c0;
+
+  --background-main: #fcfcfc;
+  --background-card: #ffffff;
+  --background-accent: #f5f5f5;
+  --background-highlight: #e3f2fd;
+  --background-badge: #bbdefb;
+
+  --text-main: #263238; /* Dark Navy/Slate (메인 텍스트 색상 통일) */
+  --text-secondary: #78909c; /* Subtle Gray */
+  --text-contrast: #ffffff;
+
+  --color-gray-200: #eceff1;
+  --color-gray-400: #b0bec5;
+  --color-gray-800: #37474f;
+
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-strong: rgba(0, 0, 0, 0.3);
+
+  /* Typography */
+  --font-heading: "Pretendard", sans-serif;
+  --font-body: "Pretendard", sans-serif;
+  --font-code: "JetBrains Mono", monospace;
+
+  /* Spacing */
+  --spacing-xs: 8px;
+  --spacing-sm: 15px;
+  --spacing-md: 30px;
+  --spacing-lg: 60px;
+  --section-padding: 100px 0;
+}
+
+/* ====================================================================
+    0.1. Dark Mode Variables (Overrides)
+    ==================================================================== */
+
+[data-theme="dark"] {
+  --primary: #4fc3f7;
+  --primary-light: #81d4fa;
+  --primary-dark: #0288d1;
+
+  --background-main: #121212;
+  --background-card: #1e1e1e;
+  --background-accent: #2c2c2c;
+  --background-highlight: #0d47a1;
+  --background-badge: #0d47a1;
+
+  --text-main: #e0e0e0; /* Dark Mode 메인 텍스트 색상 통일 */
+  --text-secondary: #b0bec5;
+  --text-contrast: #121212;
+
+  --color-gray-200: #37474f;
+  --color-gray-400: #546e7a;
+  --color-gray-800: #fafafa;
+
+  --shadow-light: rgba(255, 255, 255, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.5);
+  --shadow-strong: rgba(0, 0, 0, 0.8);
+}
+
+/* Base Reset & Typography */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-main); /* 메인 텍스트 색상 통일 */
+  background-color: var(--background-main);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  line-height: 1.7;
+  min-width: 320px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-main); /* 헤딩 색상 통일 */
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  font-size: 3.5rem;
+}
+h2 {
+  font-size: 2.5rem;
+}
+h3 {
+  font-size: 1.75rem;
+}
+h4 {
+  font-size: 1.2rem;
+}
+
+p {
+  margin-bottom: 1.2rem;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--text-main); /* 본문 텍스트 색상 통일 */
+}
+
+p strong,
+li strong {
+  color: var(--primary);
+  font-weight: 700;
+  transition: color 0.4s ease;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: var(--primary-light);
+}
+
+/* Utility Classes */
+.code-font {
+  font-family: var(--font-code);
+}
+
+.glass-card {
+  background-color: var(--background-card);
+  border-radius: 15px;
+  padding: var(--spacing-md);
+  box-shadow: 0 10px 30px var(--shadow-medium);
+  transition: transform 0.3s ease, box-shadow 0.3s ease,
+    background-color 0.4s ease, border-color 0.4s ease;
+}
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px var(--shadow-strong);
+}
+
+/* ====================================================================
+    1. Layout & Scroll Progress
+    ==================================================================== */
+
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--section-padding) var(--spacing-md);
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 5px;
+  background-color: var(--primary);
+  width: 0%;
+  z-index: 1000;
+}
+
+/* ====================================================================
+    2. Theme Toggle 
+    ==================================================================== */
+
+.theme-toggle-wrapper {
+  position: fixed;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: 9999;
+}
+
+.theme-toggle-input {
+  display: none;
+}
+
+.theme-toggle-label {
+  display: block;
+  width: 50px;
+  height: 26px;
+  background-color: var(--background-accent);
+  border-radius: 50px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.4s;
+  box-shadow: 0 2px 5px var(--shadow-light);
+  overflow: hidden;
+}
+
+.theme-toggle-label::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background-color: var(--background-card);
+  border-radius: 50%;
+  transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 2;
+}
+
+.theme-toggle-input:checked + .theme-toggle-label::before {
+  transform: translateX(24px);
+}
+
+/* 아이콘 z-index 수정으로 표시 문제 해결 */
+.theme-icon {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  z-index: 3;
+  transition: opacity 0.4s ease, color 0.4s ease;
+}
+
+.theme-icon.sun {
+  left: 0;
+  color: var(--primary);
+  opacity: 1;
+}
+
+.theme-icon.moon {
+  right: 0;
+  color: var(--color-gray-800);
+  opacity: 0;
+}
+
+.theme-toggle-input:checked + .theme-toggle-label .theme-icon.sun {
+  opacity: 0;
+}
+.theme-toggle-input:checked + .theme-toggle-label .theme-icon.moon {
+  opacity: 1;
+  color: var(--primary-light);
+}
+
+/* ====================================================================
+    3. Hero Section (생략 - 변경 없음)
+    ==================================================================== */
+
+.hero-section {
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.hero-content {
+  flex: 1;
+  max-width: 600px;
+  padding-right: var(--spacing-md);
+}
+
+.hero-profile-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-profile-pic {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 20px 50px var(--shadow-medium);
+  border: 5px solid var(--primary-light);
+}
+
+.intro-greeting {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.hero-content h1 {
+  font-size: 4rem;
+  font-weight: 900;
+  margin-bottom: var(--spacing-xs);
+  min-height: 100px;
+}
+
+.hero-content h2 {
+  font-size: 1.8rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 4rem;
+  background-color: var(--primary);
+  vertical-align: middle;
+  animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.intro-summary {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-secondary);
+}
+
+.hero-links {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.cta-link,
+.secondary-link {
+  display: inline-block;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px var(--shadow-light);
+}
+
+.cta-link {
+  background-color: var(--primary);
+  color: var(--text-contrast);
+}
+.cta-link:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 6px 20px var(--shadow-medium);
+}
+
+.secondary-link {
+  background-color: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+.secondary-link:hover {
+  background-color: var(--primary);
+  color: var(--text-contrast);
+  box-shadow: 0 6px 20px var(--shadow-medium);
+}
+
+/* =========================
+   모바일 반응형 (1열 배치)
+   ========================= */
+@media (max-width: 600px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-md);
+  }
+
+  .hero-content {
+    max-width: 100%;
+    padding-right: 0;
+  }
+
+  .hero-profile-area {
+    margin-top: var(--spacing-md);
+  }
+
+  .hero-profile-pic {
+    width: 200px;
+    height: 200px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+    min-height: auto;
+  }
+
+  .hero-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .intro-summary {
+    font-size: 1rem;
+  }
+
+  .hero-links {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .cta-link,
+  .secondary-link {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ====================================================================
+    4. About Me Section (디자인 재개편 및 아이콘 최적화 + 색상 통일)
+    ==================================================================== */
+
+.about-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+}
+
+.about-left {
+  flex: 3;
+  max-width: 65%;
+
+  & > h3 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-dark);
+  }
+}
+.about-right {
+  flex: 2;
+  min-width: 35%;
+
+  & > h3 {
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-dark);
+  }
+}
+
+.profile-intro {
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.8;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--background-highlight);
+  border-left: 5px solid var(--primary);
+  border-radius: 5px;
+  color: var(--text-main); /* 수정: 본문 색상 통일 */
+  box-shadow: 0 2px 10px var(--shadow-light);
+}
+[data-theme="dark"] .profile-intro {
+  background-color: var(--background-highlight);
+  color: var(--text-main);
+}
+
+/* --- Left Side: 핵심 역량 카드 (Badge Card Style) --- */
+
+.badge-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* 2~3열 가변 */
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.badge-card {
+  padding: var(--spacing-sm);
+  background-color: var(--background-card);
+  color: var(--text-main); /* 수정: 텍스트 색상 통일 */
+  border-radius: 10px;
+  border: 1px solid var(--color-gray-200);
+  box-shadow: 0 3px 8px var(--shadow-light);
+  transition: all 0.3s ease;
+}
+.badge-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 6px 15px var(--shadow-medium);
+  transform: translateY(-3px);
+}
+[data-theme="dark"] .badge-card {
+  border-color: var(--background-accent);
+}
+
+.badge-card p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.badge-card .key-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--primary);
+  color: var(--text-contrast);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 25px;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px var(--shadow-light);
+}
+.badge-card .key-badge i {
+  margin-right: 8px;
+  color: var(--text-contrast);
+}
+[data-theme="dark"] .badge-card .key-badge {
+  background-color: var(--primary-dark);
+}
+
+/* --- Right Side: Strengths / Certifications --- */
+
+.strength-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+.strength-block {
+  padding: var(--spacing-sm);
+  background-color: var(--background-card);
+  border-radius: 8px;
+  border: 1px solid var(--color-gray-200);
+  box-shadow: 0 2px 10px var(--shadow-light);
+}
+[data-theme="dark"] .strength-block {
+  border-color: var(--background-accent);
+}
+.strength-block h4 {
+  margin-bottom: 5px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-main); /* 수정: 색상 통일 */
+}
+.strength-block i {
+  margin-right: 5px;
+  color: var(--primary);
+}
+.strength-block p {
+  font-size: 0.9rem;
+  color: var(--text-main); /* 수정: 색상 통일 */
+  margin-bottom: 0;
+}
+
+/* Certifications */
+.cert-list {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-gray-200);
+  border-radius: 8px;
+  background-color: var(--background-card);
+  box-shadow: 0 2px 10px var(--shadow-light);
+}
+[data-theme="dark"] .cert-list {
+  border-color: var(--background-accent);
+}
+.cert-list h4 {
+  font-size: 1.2rem;
+  margin-bottom: var(--spacing-sm);
+  color: var(--primary); /* 강조색 유지 */
+  border-bottom: 2px solid var(--color-gray-200);
+  padding-bottom: 5px;
+}
+.cert-list ul {
+  list-style: none;
+  padding: 0;
+}
+.cert-list li {
+  font-size: 1rem;
+  padding: 8px 0;
+  font-weight: 400;
+  color: var(--text-main); /* 수정: 색상 통일 */
+}
+.cert-list li i {
+  margin-right: 8px;
+  color: var(--primary); /* 강조색 유지 */
+}
+
+/* ====================================================================
+    5. Skills Section (애니메이션 준비 복구)
+    ==================================================================== */
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  text-align: center;
+}
+
+.skill-item {
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.circular-progress-container {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.circular-progress-svg {
+  transform: rotate(-90deg);
+}
+
+.circular-progress-track {
+  fill: none;
+  stroke: var(--background-accent);
+  stroke-width: 10;
+}
+
+/* 스킬 진행률 애니메이션을 위한 속성 복구 */
+.circular-progress-bar {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 10;
+  stroke-linecap: round;
+  /* JS에서 data-circumference 값을 가져오므로, CSS에서는 기본값만 */
+  stroke-dasharray: 377;
+  stroke-dashoffset: 377;
+  transition: stroke-dashoffset 1.5s ease-out;
+}
+/* 다크 모드 색상 */
+[data-theme="dark"] .circular-progress-track {
+  stroke: var(--background-accent);
+}
+
+.skill-level-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-main);
+  font-family: var(--font-code);
+}
+
+.skill-name-wrapper {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.skill-icon {
+  margin-right: 8px;
+  font-size: 1.3rem;
+  color: var(--primary);
+}
+
+/* ====================================================================
+    6. Career Section (날짜 폰트 크기 및 강조 개선)
+    ==================================================================== */
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 20px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  width: 2px;
+  background-color: var(--color-gray-400);
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -1px;
+  border-radius: 1px;
+}
+[data-theme="dark"] .timeline::before {
+  background-color: var(--color-gray-400);
+}
+
+.timeline-item {
+  padding: 15px 0;
+  position: relative;
+  width: 50%;
+  margin-bottom: var(--spacing-md);
+  transition: all 0.3s ease; /* 호버 전환 효과 준비 */
+}
+
+/* 좌우 정렬 (index에 따라 홀/짝) */
+.timeline-item:nth-child(odd) {
+  left: 0;
+  padding-right: var(--spacing-lg);
+  text-align: right;
+}
+.timeline-item:nth-child(even) {
+  left: 50%;
+  padding-left: var(--spacing-lg);
+  text-align: left;
+}
+
+.timeline-dot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: var(--text-secondary); /* 기본 색상 통일 */
+  border-radius: 50%;
+  top: 30px;
+  z-index: 10;
+  border: 3px solid var(--background-main);
+  transition: all 0.3s ease;
+}
+
+.timeline-item:nth-child(odd) .timeline-dot {
+  right: -7px;
+}
+.timeline-item:nth-child(even) .timeline-dot {
+  left: -7px;
+}
+[data-theme="dark"] .timeline-dot {
+  border-color: var(--background-main);
+}
+
+/* --- Career 강조 및 호버 효과 --- */
+
+/* 가장 최근 항목 강조 (첫 번째 항목) */
+.timeline-item:first-child .timeline-dot {
+  background-color: var(--primary);
+  box-shadow: 0 0 0 5px rgba(25, 118, 210, 0.3);
+}
+
+.timeline-item:first-child .timeline-date {
+  color: var(--primary);
+  font-weight: 700;
+}
+.timeline-item:first-child .timeline-content h4 {
+  color: var(--primary);
+}
+
+/* 마우스 오버 시 모든 항목 강조 전환 */
+.timeline-item:hover .timeline-dot {
+  background-color: var(--primary-light);
+  transform: scale(1.2);
+}
+.timeline-item:hover .timeline-date {
+  color: var(--primary);
+}
+.timeline-item:hover .timeline-content {
+  box-shadow: 0 8px 25px var(--shadow-strong);
+  transform: translateY(-3px);
+  border-color: var(--primary-light); /* 호버시 경계색 강조 */
+}
+
+.timeline-content {
+  padding: var(--spacing-md);
+  border-radius: 10px;
+  background-color: var(--background-card);
+  box-shadow: 0 5px 20px var(--shadow-medium);
+  border: 1px solid var(--color-gray-200);
+  transition: all 0.3s ease;
+}
+[data-theme="dark"] .timeline-content {
+  border-color: var(--background-accent);
+}
+
+.timeline-date {
+  /* 날짜 폰트 크기 증가 */
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 1rem; /* 크기 증가 */
+  font-family: var(--font-code);
+  transition: color 0.3s ease;
+}
+
+.company-name {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 1em;
+  margin-left: 5px;
+}
+
+.timeline-content h4 {
+  font-size: 1.4rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-main); /* 기본 색상 통일 */
+  transition: color 0.3s ease;
+}
+
+.timeline-content .description {
+  font-size: 0.95rem;
+  margin-top: 10px;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+/* ====================================================================
+    7. Projects Section (모달 복구를 위해 재추가)
+    ==================================================================== */
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 30px;
+  padding-top: 20px;
+}
+
+.project-card {
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  border: 1px solid var(--background-accent);
+}
+
+.project-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.project-card:hover .project-image {
+  transform: scale(1.05);
+}
+
+.project-info {
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 150px;
+}
+
+.project-info h3 {
+  font-size: 1.5rem;
+  margin-bottom: 5px;
+  color: var(--primary-dark);
+}
+.project-info p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tags span {
+  display: inline-block;
+  background-color: var(--background-accent);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 5px;
+  margin-right: 6px;
+  margin-top: 4px;
+  font-family: var(--font-code);
+}
+[data-theme="dark"] .tags span {
+  background-color: var(--background-accent);
+  color: var(--text-secondary);
+}
+
+/* ====================================================================
+    8. Contact Section (생략 - 변경 없음)
+    ==================================================================== */
+
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
+.contact-item h4 {
+  color: var(--primary);
+  margin-bottom: var(--spacing-xs);
+  font-size: 1.3rem;
+}
+
+.contact-item p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.contact-item a {
+  display: inline-block;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 5px;
+  border-bottom: 1px solid var(--primary);
+  padding-bottom: 2px;
+}
+
+/* ====================================================================
+    9. Footer (생략 - 변경 없음)
+    ==================================================================== */
+
+footer {
+  text-align: center;
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--background-accent);
+  background-color: var(--background-card);
+  padding-bottom: calc(var(--spacing-md) + 80px);
+}
+footer p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ====================================================================
+    10. Floating Navigation (생략 - 변경 없음)
+    ==================================================================== */
+
+.floating-nav {
+  position: fixed;
+  bottom: var(--spacing-md);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background-card);
+  box-shadow: 0 5px 20px var(--shadow-medium);
+  border-radius: 50px;
+  padding: 10px 15px;
+  display: flex;
+  gap: 15px;
+  z-index: 900;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.nav-item {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  border-radius: 50%;
+  font-size: 1.2rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background-color: var(--primary);
+  color: var(--text-contrast);
+}
+
+/* ====================================================================
+    12. Project Modal (복구)
+    ==================================================================== */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  padding: 40px 0;
+}
+
+.modal.open {
+  display: block;
+}
+
+.modal-content {
+  background-color: var(--background-card);
+  margin: 5% auto;
+  padding: var(--spacing-md);
+  border-radius: 15px;
+  width: 90%;
+  max-width: 1000px;
+  box-shadow: 0 10px 40px var(--shadow-strong);
+  position: relative;
+  animation: fadeInScale 0.3s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
+.close-button {
+  color: var(--text-secondary);
+  float: right;
+  font-size: 36px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+}
+.close-button:hover,
+.close-button:focus {
+  color: var(--primary);
+}
+
+.modal-body {
+  padding-top: 20px;
+}
+
+#modal-title {
+  color: var(--primary);
+  margin-bottom: 5px;
+  font-size: 2rem;
+}
+#modal-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  font-style: italic;
+}
+
+/* Project Slider */
+.project-slider {
+  position: relative;
+  max-width: 100%;
+  margin-bottom: var(--spacing-md);
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+#modal-slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.project-slide-item {
+  min-width: 100%;
+  display: none;
+  text-align: center;
+}
+.project-slide-item img {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: var(--background-accent);
+}
+
+/* Slider Navigation Buttons */
+.slider-nav button {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 0;
+  font-size: 1.5rem;
+  transition: background-color 0.3s;
+  z-index: 10;
+  border-radius: 50%;
+}
+
+.slider-nav .prev-btn {
+  left: 10px;
+}
+.slider-nav .next-btn {
+  right: 10px;
+}
+
+.slider-nav button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Slide Indicators (Dots) */
+.slide-dots-container {
+  text-align: center;
+  padding: 10px 0 0;
+}
+.slide-dot {
+  cursor: pointer;
+  height: 12px;
+  width: 12px;
+  margin: 0 4px;
+  background-color: var(--color-gray-200);
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border: 1px solid var(--color-gray-400);
+}
+.slide-dot.active {
+  background-color: var(--primary);
+  transform: scale(1.2);
+}
+[data-theme="dark"] .slide-dot {
+  background-color: var(--color-gray-600);
+  border-color: var(--color-gray-400);
+}
+
+/* Detail Grid */
+.detail-grid {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+.detail-left {
+  flex: 2;
+}
+.detail-right {
+  flex: 1;
+}
+
+.detail-grid h4 {
+  color: var(--primary);
+  border-bottom: 2px solid var(--background-accent);
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+
+#modal-description {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.key-feature-list {
+  list-style: none;
+  padding-left: 0;
+}
+.key-feature-list li {
+  font-size: 0.95rem;
+  padding: 4px 0;
+  color: var(--text-main);
+}
+.key-feature-list i {
+  margin-right: 8px;
+  color: var(--primary);
+}
+
+.tag-in-modal {
+  display: inline-block;
+  background-color: var(--background-accent);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 5px;
+  margin-right: 8px;
+  margin-top: 8px;
+  font-family: var(--font-code);
+}
+[data-theme="dark"] .tag-in-modal {
+  background-color: var(--background-accent);
+}
+
+.links-section {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  padding-top: var(--spacing-sm);
+  border-top: 1px dashed var(--background-accent);
+}
+.github-link,
+.demo-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: var(--text-contrast);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px var(--shadow-light);
+}
+.github-link {
+  background-color: var(--color-gray-800);
+}
+.github-link i {
+  margin-right: 8px;
+}
+.github-link:hover {
+  background-color: #555;
+  box-shadow: 0 6px 15px var(--shadow-medium);
+}
+
+.demo-link {
+  background-color: var(--primary);
+}
+.demo-link i {
+  margin-right: 8px;
+}
+.demo-link:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 6px 15px var(--shadow-medium);
+}
+
+/* ====================================================================
+    13. Reveal Animation (생략 - 변경 없음)
+    ==================================================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ====================================================================
+    14. Responsive Design
+    ==================================================================== */
+
+@media (max-width: 992px) {
+  :root {
+    --section-padding: 60px 0;
+  }
+
+  /* Hero */
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    min-height: auto;
+    padding-top: 100px;
+  }
+  .hero-content {
+    max-width: 100%;
+    padding-right: 0;
+    margin-bottom: var(--spacing-lg);
+  }
+  .hero-content h1 {
+    font-size: 3rem;
+    min-height: 80px;
+  }
+  .hero-profile-pic {
+    width: 250px;
+    height: 250px;
+  }
+
+  /* About */
+  .about-container {
+    flex-direction: column;
+  }
+  .about-left,
+  .about-right {
+    max-width: 100%;
+    min-width: 100%;
+  }
+  .badge-card-grid {
+    grid-template-columns: 1fr; /* 모바일에서 1열로 변경 */
+  }
+  .strength-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Career (모바일 중앙선 정렬) */
+  .timeline::before {
+    left: 20px;
+  }
+  .timeline-item {
+    width: 100%;
+    left: 0 !important;
+    padding-left: 50px;
+    padding-right: 10px;
+    text-align: left !important;
+  }
+  .timeline-item:nth-child(odd) .timeline-dot,
+  .timeline-item:nth-child(even) .timeline-dot {
+    left: 17px !important;
+    right: auto !important;
+  }
+  .timeline-date {
+    position: static;
+    margin-bottom: 5px;
+    opacity: 1;
+  }
+
+  /* Footer 가림 방지 (모바일용) */
+  footer {
+    padding-bottom: calc(var(--spacing-md) + 80px);
+  }
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+  h2 {
+    font-size: 2rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+    min-height: 60px;
+  }
+
+  .hero-links {
+    flex-direction: column;
+  }
+  .cta-link,
+  .secondary-link {
+    text-align: center;
+  }
+
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .floating-nav {
+    padding: 8px 10px;
+    gap: 10px;
+  }
+  .nav-item {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    padding: var(--spacing-sm);
+    margin: 10% auto;
+  }
+}

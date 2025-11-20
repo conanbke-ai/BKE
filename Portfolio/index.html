@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>배경은 - 포트폴리오</title> 
+    
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    
+</head>
+<body class="touch" data-theme="light"> 
+    <div class="scroll-progress"></div>
+
+    <div class="theme-toggle-wrapper">
+        <input type="checkbox" id="theme-toggle" class="theme-toggle-input" checked>
+        <label for="theme-toggle" class="theme-toggle-label magnetic-btn">
+            <span class="theme-icon sun"><i class="fas fa-sun"></i></span>
+            <span class="theme-icon moon"><i class="fas fa-moon"></i></span>
+        </label>
+    </div>
+
+    <section id="hero" class="section hero-section">
+        <div class="hero-content reveal">
+            <p class="intro-greeting">안녕하세요! 👋</p>
+            <h1>
+                <span id="typing-text"></span>
+                <span class="typing-cursor"></span>
+            </h1>
+            <h2>도전과 성장을 멈추지 않는 개발자입니다.</h2>
+            <p class="intro-summary">
+                고객이 원하는 방향을 정확히 읽고 그에 맞는 해결책을 편안하게 제안합니다.<br>
+                새로운 기술을 빠르게 배우고 실무에 적용하며,<br>
+                원활하고 적극적인 커뮤니케이션으로 함께 일하는 사람들과 시너지를 만들어갑니다.
+            </p>
+            <div class="hero-links">
+                <a href="#projects" class="cta-link magnetic-btn">프로젝트 보기</a>
+                <a href="#contact" class="secondary-link magnetic-btn">CONTACT ME</a>
+            </div>
+        </div>
+        <div class="hero-profile-area">
+            <img src="profile_placeholder.jpg" alt="Profile Picture" class="hero-profile-pic">
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <h2 class="section-title reveal">ABOUT ME</h2>
+        <div class="about-container reveal">
+            
+            <div class="about-left glass-card">
+                <h3>자기소개</h3>
+                <div id="about-me-summary"></div>
+            </div>
+
+            <div class="about-right glass-card">
+                <h3>강점 및 기술 역량</h3>
+                <div id="about-me-details"></div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="skills" class="section">
+        <h2 class="section-title reveal">SKILLS</h2>
+        <div id="skills-list" class="skills-list"></div>
+    </section>
+
+    <section id="career" class="section">
+        <h2 class="section-title reveal">CAREER & EXPERIENCE</h2>
+        <div id="timeline" class="timeline"></div>
+    </section>
+
+    <section id="projects" class="section">
+        <h2 class="section-title reveal">PROJECTS</h2>
+        <div id="projects-grid" class="projects-grid"></div>
+    </section>
+
+    <section id="contact" class="section">
+        <h2 class="section-title reveal">CONTACT ME</h2>
+        <div class="contact-info-grid reveal glass-card">
+            <div class="contact-item">
+                <h4>Email</h4>
+                <p>baekee@naver.com</p>
+                <a href="mailto:baekee@naver.com">이메일 보내기</a>
+            </div>
+            <div class="contact-item">
+                <h4>GitHub</h4>
+                <p class="code-font">https://github.com/conanbke-ai</p>
+                <a href="https://github.com/conanbke-ai" target="_blank">방문하기</a>
+            </div>
+            <div class="contact-item">
+                <h4>Resume/Link</h4>
+                <p>View My Detailed Resume</p>
+                <a href="#" target="_blank">이력서 보기</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Bae Kyung Eun. All rights reserved. | Developed with HTML, CSS, & JavaScript.</p>
+    </footer>
+
+    <nav class="floating-nav">
+        <a href="#hero" class="nav-item active magnetic-btn"><i class="fas fa-home"></i></a>
+        <a href="#about" class="nav-item magnetic-btn"><i class="fas fa-user"></i></a>
+        <a href="#skills" class="nav-item magnetic-btn"><i class="fas fa-cogs"></i></a>
+        <a href="#career" class="nav-item magnetic-btn"><i class="fas fa-briefcase"></i></a>
+        <a href="#projects" class="nav-item magnetic-btn"><i class="fas fa-code"></i></a>
+        <a href="#contact" class="nav-item magnetic-btn"><i class="fas fa-envelope"></i></a>
+    </nav>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-dot-outline"></div>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-body">
+                <h3 id="modal-title">프로젝트 이름</h3>
+                <p id="modal-subtitle" class="subtitle">간략한 요약 설명</p>
+
+                <div class="project-slider">
+                    <div id="modal-slides"></div> 
+                    <div class="slider-nav">
+                        <button class="prev-btn" onclick="plusSlides(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <button class="next-btn" onclick="plusSlides(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+                    <div class="detail-left">
+                        <h4>프로젝트 개요 및 역할</h4>
+                        <p id="modal-description"></p>
+                        
+                        <h4>주요 기능</h4>
+                        <ul id="modal-features" class="key-feature-list">
+                            </ul>
+                    </div>
+                    <div class="detail-right">
+                        <h4>기술 스택</h4>
+                        <div id="modal-tags" class="tags">
+                            </div>
+                        <div id="modal-period" style="margin-top: 15px;">
+                            <p style="font-size: 0.95rem; color: var(--text-main); font-weight: 600;">
+                                <i class="far fa-calendar-alt" style="color: var(--primary); margin-right: 5px;"></i> 기간: <span id="modal-duration"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="links-section">
+                    <a id="modal-github" href="#" target="_blank" class="github-link magnetic-btn" style="display:none;">
+                        <i class="fab fa-github"></i> GitHub Repository
+                    </a>
+                    <a id="modal-demo" href="#" target="_blank" class="demo-link magnetic-btn" style="display:none;">
+                        <i class="fas fa-external-link-alt"></i> Live Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/script.js"></script>
+</body>
+</html>
