@@ -13,7 +13,24 @@ N개의 문자열 데이터를 입력받아 앞에서 읽을 때나 뒤에서 �
 각 줄에 해당 문자열의 결과를 YES 또는 NO로 출력한다.
 '''
 
-def solution():
-    return 
+def solution(words):
+    
+    result = []
+    
+    for word in words:
+        # 대소문자 구분 X
+        word = word.upper()
+        
+        for i in range(len(word)):
+            if word[i] == word[len(word)-1-i]:
+                continue
+            else:
+                result.append("NO")
+                break
+        else:
+            result.append("YES")
+            
+    return result
+
 
 print(solution(["level", "moon", "abcba", "soon", "gooG"]))
