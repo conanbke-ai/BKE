@@ -25,8 +25,15 @@
 1부터 20까지 오름차순으로 놓인 카드들에 대해, 입력으로 주어진 10개의 구간 순서대로 뒤집는 작업을 했을 때 마지막 카드들의 배치를 한 줄에 출력한다.
 '''
 
-def solution():
-    
-    result = ""
-    
-    return result
+def solution(num, ranges):
+    # 1 ~ num 까지 카드 준비
+    lst = [i for i in range(1, num + 1)]
+
+    for a, b in ranges:
+        # a,b는 1 기반이므로 인덱스로 쓸 때는 a-1 ~ b
+        # 그 구간을 통째로 뒤집어서 다시 넣기
+        lst[a-1:b] = lst[a-1:b][::-1]   # 또는 list(reversed(lst[a-1:b]))
+
+    return lst
+
+print(solution(20, [(5, 10), (9, 13), (1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6),  (1, 20), (1, 20)]))
