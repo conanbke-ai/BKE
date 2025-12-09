@@ -11,14 +11,13 @@ N개의 수로 된 수열 A[1], A[2], …, A[N] 이 있다.
 첫째 줄에 경우의 수를 출력한다.
 '''
 
-def solution(N):
+def solution(i, j, A):
     
-    M = []
+    if i > j:
+        i, j = j, i
+        
+    result = A[i:j+1]
     
-    for i in range(len(N)):
-        for j in range(1, len(N)):
-    
-    
-    return len(M)
+    return sum(result)
 
-print(solution([1, 2, 1, 3, 1, 1, 1, 2,]))
+print(solution(8, 3, [1, 2, 1, 3, 1, 1, 1, 2]))
