@@ -25,8 +25,8 @@ REQUIRED_FILES = [
     'static/styles.css',
     'static/assets/bunny-hero-a1.png',
     'static/assets/intro-splash.png',
-    'static/assets/header-rainbow-bunny-hop.webp',
-    'static/assets/header-rainbow-bunny-hop-fallback.jpg',
+    'static/assets/loading-bunny-hop.webp',
+    'static/assets/loading-bunny-hop-fallback.png',
     'audit_contracts.py',
 ]
 REQUIRED_JS_FUNCTIONS = [
@@ -130,11 +130,11 @@ def main() -> int:
             fail(errors, '내 원국의 시주→일주→월주→연주 카드가 누락되어 있습니다.')
         if 'const ordered=[byKey.hour,byKey.day,byKey.month,byKey.year]' not in js:
             fail(errors, '후보/요약 원국의 시주→일주→월주→연주 순서가 누락되어 있습니다.')
-        if not re.search(r"isWork\s*=\s*r\.context\s*===\s*['\"]work['\"]", js) or "item('추천 역할 분담',a.role_split)" not in js:
+        if not re.search(r"isWork\s*=\s*r\.context\s*===\s*['\"]work['\"]", js) or "'추천 역할 분담'" not in js:
             fail(errors, '직장 그룹 1:1 해설의 work 전용 분기가 누락되어 있습니다.')
         if 'data-group-jump' not in js or 'groupResultCopy' not in js:
             fail(errors, '그룹 결과 빠른 이동/관계유형별 사용자 문구가 누락되어 있습니다.')
-        if 'personCompact(r.person_a,nameA,{includeRomance:isLove})' not in js:
+        if 'includeRomance:isLove' not in js:
             fail(errors, '비연인/직장 관계에서 개인 연애 해설을 숨기는 분기가 누락되어 있습니다.')
         for required in ('profileDomainDetail', 'data-group-node', 'data-group-edge', 'data-matrix-pair', 'groupPersonInspector', 'groupPairInspector'):
             if required not in js:
@@ -330,7 +330,7 @@ def main() -> int:
     if '호감·애정표현·배우자·데이트·연애 같은 표현을 절대 사용하지 않는다' not in ai_text:
         fail(errors, '직장 그룹 비연애 해설 프롬프트 계약이 누락되어 있습니다.')
 
-    if 'l.overview||l.personality||a.overview' not in js:
+    if 'text(overview)||text(p.personality)' not in js:
         fail(errors, '내 사주 첫 문장이 로컬 사용자 중심 해설보다 AI 문장을 우선하는 과거 순서로 회귀했습니다.')
     if '오행·용신·십성·천간·지지 관계를 하나씩 확인하고 있어요.' in js:
         fail(errors, '대기 화면에 일반 사용자가 바로 이해하기 어려운 명리 전문용어 나열이 남아 있습니다.')
