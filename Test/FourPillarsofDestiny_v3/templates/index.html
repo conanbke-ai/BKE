@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#fffaf7">
+  <title>{{ app_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260819-r43-polish') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='ui_patch.css', v='20260819-r43-polish') }}">
+</head>
+<body class="{{ '' if test_mode else 'intro-active' }}" data-test-mode="{{ 'true' if test_mode else 'false' }}" data-test-fixture-available="{{ 'true' if test_fixture else 'false' }}" data-bunny-src="{{ url_for('static', filename='assets/bunny-hero-a1.png', v='20260819-r43-polish') }}">
+  <div class="cloud cloud-a" aria-hidden="true"></div>
+  <div class="cloud cloud-b" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <section id="introSplash" class="intro-splash {{ 'hidden' if test_mode else '' }}" aria-label="나의 사주 리포트 시작 화면">
+      <div class="intro-artboard">
+        <div class="intro-asset-fallback" aria-hidden="true">
+          <div><span>토끼가 차근차근 풀어주는 사주 노트</span><strong>나의 사주 리포트</strong><p>내 사주와 운세부터 궁합까지 한 번에 살펴봐요.</p></div>
+          <span class="intro-fallback-bunny">🐰</span>
+        </div>
+        <img class="intro-splash-image" src="{{ url_for('static', filename='assets/intro-splash.png', v='20260819-r43-polish') }}" alt="토끼가 차근차근 풀어주는 나의 사주 리포트 시작 화면" onerror="this.classList.add('asset-failed')">
+        <div class="intro-start-wrap">
+          <button id="introStartButton" class="intro-start-button" type="button">
+            <span class="intro-start-icon" aria-hidden="true">✦</span>
+            <span class="intro-start-label">사주 리포트 시작하기</span>
+            <span class="intro-start-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="onboarding" class="onboarding input-screen card bunny-surface {{ '' if test_mode else 'hidden' }}">
+      <header class="input-screen-head">
+        <div class="input-header-art" aria-hidden="true">
+          <img class="input-header-static-image" src="{{ url_for('static', filename='assets/input-header-art.jpg', v='20260819-r43-polish') }}" alt="">
+        </div>
+        <button id="inputBackButton" class="input-back-button" type="button" aria-label="시작 화면으로 돌아가기">
+          <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7M9 12h10"/></svg>
+        </button>
+        <div class="input-screen-title">
+          <span class="input-kicker">MY SAJU NOTE ✦</span>
+          <h1>내 출생정보</h1>
+          {% if test_fixture %}
+          <button id="quickTestFixtureButton" class="quick-test-fixture" type="button">테스트 데이터 사용</button>
+          {% endif %}
+        </div>
+
+      </header>
+      <form id="profileForm" class="onboarding-form" novalidate>
+        <section class="form-section bunny-panel" aria-labelledby="birthInfoTitle">
+          <div class="panel-title">
+            <span class="feature-badge badge-birth" aria-hidden="true">
+              <svg class="ui-icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 9h16M8 13h3M8 17h6"/></svg>
+            </span>
+            <div>
+              <strong id="birthInfoTitle">내 출생정보</strong>
+              <small><span class="example-inline">입력 예시 · 2000.01.01 12:00</span></small>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label>이름<input name="name" value="나" autocomplete="name" required></label>
+            <label>성별<select name="gender"><option value="F">여성</option><option value="M">남성</option></select></label>
+            <label>양력/음력<select name="calendar_type"><option value="solar">양력</option><option value="lunar">음력</option></select></label>
+            <label class="leap-field hidden"><span>윤달 여부</span><select name="is_leap_month"><option value="false">평달</option><option value="true">윤달</option></select></label>
+
+            <div class="wide birth-entry-card" data-birth-entry="main">
+              <div class="birth-entry-head">
+                <div>
+                  <strong>생년월일</strong>
+                  <small class="field-help">직접 입력이 가장 빠르고, 필요하면 빠른 선택을 이용할 수 있어요.</small>
+                </div>
+                <button type="button" class="birth-picker-open" data-open-birth-picker="main">
+                  <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 9h16"/></svg>
+                  <span>날짜 빠르게 고르기</span>
+                </button>
+              </div>
+              <input class="birth-text-input" type="text" inputmode="numeric" autocomplete="bday" data-birth-text="main" placeholder="2000.01.01" aria-label="생년월일" required>
+              <small class="field-help">점·하이픈·슬래시 또는 숫자 8자리 모두 입력할 수 있어요.</small>
+              <div class="field-error hidden" data-error-for="main-birth" role="alert"></div>
+              <input name="year" type="hidden">
+              <input name="month" type="hidden">
+              <input name="day" type="hidden">
+
+              <div class="birth-picker-modal hidden" data-birth-picker-panel="main" role="dialog" aria-modal="true" aria-label="출생일 빠른 선택">
+                <button type="button" class="birth-picker-backdrop" data-close-birth-picker="main" tabindex="-1" aria-label="닫기"></button>
+                <div class="birth-picker-panel">
+                  <div class="birth-picker-title-row">
+                    <div class="birth-picker-title"><strong>출생일 빠른 선택</strong><small>연도를 직접 입력한 뒤 월과 일을 선택하세요.</small></div>
+                    <button type="button" class="dialog-close" data-close-birth-picker="main" aria-label="닫기">×</button>
+                  </div>
+                  <div class="birth-year-jump">
+                    <button type="button" data-year-step="-10">−10년</button>
+                    <button type="button" data-year-step="-1">−1</button>
+                    <label><span>연도</span><input type="number" min="1900" max="2100" data-picker-year="main" placeholder="2000"></label>
+                    <button type="button" data-year-step="1">+1</button>
+                    <button type="button" data-year-step="10">+10년</button>
+                  </div>
+                  <div class="birth-picker-subtitle">월</div>
+                  <div class="birth-month-grid" data-picker-months="main"></div>
+                  <div class="birth-picker-subtitle">일</div>
+                  <div class="birth-day-grid" data-picker-days="main"></div>
+                  <div class="birth-picker-actions"><button type="button" class="primary-button compact" data-confirm-birth-picker="main">이 날짜 사용하기</button></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wide time-field-block" data-main-time-block data-time-block="main">
+              <div class="field-caption">출생시간</div>
+              <div class="time-choice" role="group" aria-label="출생시간 확인 여부">
+                <button type="button" class="time-choice-button active" data-time-set="known">
+                  <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span>시간을 알아요</span>
+                </button>
+                <button type="button" class="time-choice-button" data-time-set="unknown">
+                  <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5ZM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg><span>시간을 몰라요</span>
+                </button>
+              </div>
+              <input name="time_unknown" type="checkbox" class="sr-only" aria-hidden="true">
+              <div data-time-inputs-for="main">
+                <input class="time-text-input" type="text" inputmode="numeric" autocomplete="bday-time" data-time-text="main" placeholder="12:00" aria-label="출생시간" required>
+                <small class="field-help">24시간제로 입력해요. 오후 3시는 15:00이며, 15만 입력하면 15:00으로 정리됩니다. 정확한 시간을 모르면 ‘시간을 몰라요’를 선택해 주세요.</small>
+                <div class="field-error hidden" data-error-for="main-time" role="alert"></div>
+                <input name="hour" type="hidden">
+                <input name="minute" type="hidden">
+              </div>
+              <div class="time-unknown-message hidden" data-time-msg-for="main">
+                <span class="bunny-peek" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5ZM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg></span>
+                <div><strong>출생시간 없이 분석할게요.</strong><small>시주를 임의로 만들지 않고 확인 가능한 연주·월주·일주를 중심으로 봅니다.</small></div>
+              </div>
+            </div>
+
+            <label>출생 국가<select name="country_code" class="country-select"><option value="KR">대한민국</option></select></label>
+            <label class="other-country hidden">국가명<input name="country_custom" placeholder="예: Iceland"></label>
+            <label class="foreign-city hidden">출생 도시<input name="city" placeholder="예: New York"></label>
+            <div class="wide location-guide">대한민국 출생은 도시를 따로 받지 않아요. 해외 출생은 국가와 도시를 확인해 해당 지역의 시간 기준을 맞춥니다.</div>
+          </div>
+        </section>
+
+        <section class="form-section bunny-panel option-panel" aria-labelledby="analysisOptionsTitle">
+          <div class="panel-title">
+            <span class="feature-badge badge-options" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h14"/><circle cx="8" cy="6" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="10" cy="18" r="1.6"/></svg></span>
+            <div><strong id="analysisOptionsTitle">이번에 같이 볼 것</strong><small>필요한 분석만 골라 한 번에 구성할 수 있어요.</small></div>
+          </div>
+          <div class="option-cards">
+            <label class="option-card selected"><input name="build_matches" type="checkbox" checked><span class="option-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 9.2c0 5-8.5 10.2-8.5 10.2S3.5 14.2 3.5 9.2A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.5 1.2Z"/></svg></span><span><strong>잘 맞는 사람 찾기</strong><small>연인·친구 TOP 10과 최적 출생일시</small></span></label>
+            <label class="option-card"><input name="include_pair" type="checkbox"><span class="option-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3.5 19c.4-3.2 2-5 4.5-5s4.1 1.8 4.5 5M11.5 19c.4-3.2 2-5 4.5-5s4.1 1.8 4.5 5"/></svg></span><span><strong>1:1 궁합 함께</strong><small>궁금한 한 사람을 첫 리포트에 포함</small></span></label>
+            <label class="option-card"><input name="include_group" type="checkbox"><span class="option-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="2.5"/><circle cx="6" cy="10" r="2"/><circle cx="18" cy="10" r="2"/><path d="M8 19c.3-3.2 1.6-5 4-5s3.7 1.8 4 5M2.8 18c.2-2.5 1.3-4 3.2-4M21.2 18c-.2-2.5-1.3-4-3.2-4"/></svg></span><span><strong>그룹 궁합 함께</strong><small>친구·직장·가족 등 여러 사람의 관계 구조</small></span></label>
+          </div>
+          <div id="matchOptionFields" class="option-extra"><label class="compact-label">추천 상대 성별<select name="partner_gender"><option value="M">남성</option><option value="F">여성</option></select></label><p class="tiny-guide" id="ageRangeGuide">추천 범위는 현재 연령대에 맞춰 자동으로 정해집니다.</p></div>
+        </section>
+
+        <div id="estimatedTimePreview" class="estimate-preview" aria-live="polite">
+          <span class="estimate-preview-icon" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></span>
+          <div><small id="analysisSummaryText">내 사주 · 운세 · 잘 맞는 사람</small><strong id="estimatedTimeText">계산 중…</strong><span>캐시·테스트 실행은 학습에서 제외하고 일반 신규 분석 기준으로 넉넉하게 계산해요. 실제 분석이 시작되면 진행 속도로 다시 보정합니다.</span></div>
+        </div>
+        <div class="initial-extra-stack" aria-live="polite">
+          <div id="initialPairFields" class="option-extra hidden"></div>
+          <div id="initialGroupFields" class="option-extra hidden"></div>
+        </div>
+        <button id="createReportButton" class="primary-button bunny-button compact-submit" type="submit"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5ZM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg><span>리포트 시작하기</span></button>
+      </form>
+      <p class="micro">사주명리는 전통 해석 체계이며 과학적으로 검증된 미래 예측이나 관계 성공 확률이 아닙니다.</p>
+    </section>
+
+    <section id="workspace" class="workspace hidden">
+      <header class="report-header card rainbow-topbar">
+        <div class="topbar-brand compact-brand"><div class="approved-bunny-logo" aria-hidden="true"><img src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260819-r43-polish') }}" alt=""></div><div><span class="workspace-mini-kicker">MY SAJU NOTE ✦</span><h1 id="workspaceTitle">나의 사주 리포트</h1></div></div>
+        <div class="header-actions"><button id="printButton" class="ghost-button compact-reset" type="button">인쇄·PDF</button><button id="resetButton" class="ghost-button compact-reset" type="button">정보 수정</button></div>
+      </header>
+      <nav class="main-nav compact-nav candy-launcher card" aria-label="리포트 메뉴">
+        <button class="nav-button active" data-page="profile"><span class="nav-ico"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2v8.3a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1Z"/></svg></span><span>내 사주</span><small>원국·해설</small></button>
+        <button class="nav-button" data-page="fortune"><span class="nav-ico"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span>운세</span><small>오늘·월·연</small></button>
+        <button class="nav-button" data-page="auto"><span class="nav-ico"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M20.5 9.2c0 5-8.5 10.2-8.5 10.2S3.5 14.2 3.5 9.2A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.5 1.2Z"/></svg></span><span>잘 맞는 사람</span><small>추천 TOP</small></button>
+        <button class="nav-button" data-page="pair"><span class="nav-ico"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3.5 19c.4-3.2 2-5 4.5-5s4.1 1.8 4.5 5M11.5 19c.4-3.2 2-5 4.5-5s4.1 1.8 4.5 5"/></svg></span><span>1:1 궁합</span><small>연인·친구</small></button>
+        <button class="nav-button" data-page="group"><span class="nav-ico"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="2.5"/><circle cx="6" cy="10" r="2"/><circle cx="18" cy="10" r="2"/><path d="M8 19c.3-3.2 1.6-5 4-5s3.7 1.8 4 5M2.8 18c.2-2.5 1.3-4 3.2-4M21.2 18c-.2-2.5-1.3-4-3.2-4"/></svg></span><span>그룹 궁합</span><small>팀·모임</small></button>
+        <button class="nav-button" data-page="details"><span class="nav-ico"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22Z"/></svg></span><span>해석 근거</span><small>궁금할 때만</small></button>
+      </nav>
+      <section id="page-profile" class="page active"></section><section id="page-fortune" class="page"></section><section id="page-auto" class="page"></section><section id="page-pair" class="page"></section><section id="page-group" class="page"></section><section id="page-details" class="page"></section>
+    </section>
+  </main>
+
+  <div id="loading" class="loading hidden" role="dialog" aria-modal="true" aria-labelledby="loadingTitle">
+    <div class="loading-card bunny-loading">
+      <div class="loading-sky loading-hop-stage" aria-hidden="true">
+        <span class="loading-stage-star star-a">✦</span>
+        <span class="loading-stage-star star-b">✧</span>
+        <span class="loading-stage-star star-c">♡</span>
+        <picture class="loading-bunny-sprite">
+          <source media="(prefers-reduced-motion: reduce)" srcset="{{ url_for('static', filename='assets/loading-bunny-hop-fallback.png', v='20260819-r43-polish') }}">
+          <source type="image/webp" srcset="{{ url_for('static', filename='assets/loading-bunny-hop.webp', v='20260819-r43-polish') }}">
+          <img src="{{ url_for('static', filename='assets/loading-bunny-hop-fallback.png', v='20260819-r43-polish') }}" alt="깡총깡총 뛰는 토끼">
+        </picture>
+      </div>
+      <strong id="loadingTitle">리포트를 만들고 있어요</strong>
+      <p id="loadingText">출생정보와 사주 흐름을 차근차근 확인하고 있어요.</p>
+      <div class="loading-progress-block">
+        <div class="loading-progress-head"><span id="loadingStage">분석을 준비하고 있어요</span><strong id="loadingPercent">0%</strong></div>
+        <div class="loading-progress-track" aria-hidden="true"><div id="loadingProgressFill" class="loading-progress-fill"></div></div>
+        <div class="loading-time-row"><span id="loadingExpected">예상 시간을 계산하고 있어요.</span><strong id="loadingRemaining"></strong></div>
+        <div id="loadingSteps" class="loading-steps" aria-label="분석 진행 단계"></div>
+      </div>
+      <button id="cancelAnalysisButton" type="button" class="loading-cancel">분석 중단</button>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  {% if test_fixture %}
+  <script id="testFixtureData" type="application/json">{{ test_fixture|tojson }}</script>
+  {% endif %}
+  <script src="{{ url_for('static', filename='app.js', v='20260819-r43-polish') }}"></script>
+</body>
+</html>

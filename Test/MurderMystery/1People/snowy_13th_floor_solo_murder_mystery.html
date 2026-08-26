@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>눈 내리는 13층 — 1인용 머더미스터리</title>
+  <style>
+    :root{
+      --bg:#0b1017;--panel:#121a25;--panel2:#182332;--line:#2a3a4e;
+      --text:#e8edf3;--muted:#9eacbd;--accent:#c9a96e;--accent2:#8fb9d9;
+      --danger:#d98282;--ok:#82c6a4;--shadow:0 18px 45px rgba(0,0,0,.34)
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;color:var(--text);background:
+      radial-gradient(circle at 20% -10%,rgba(93,130,168,.16),transparent 34rem),
+      linear-gradient(180deg,#0a0f15,#0e141d 55%,#090d12);
+      font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.65}
+    button,input,textarea,select{font:inherit} button{cursor:pointer}
+    .shell{max-width:1120px;margin:auto;padding:0 18px 80px}
+    .topbar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;
+      justify-content:space-between;margin:0 -18px 26px;padding:12px 18px;
+      background:rgba(8,12,18,.9);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.03em}
+    .snow{color:#d9efff}.tools{display:flex;flex-wrap:wrap;gap:8px}
+    .btn{border:1px solid var(--line);border-radius:10px;padding:9px 13px;color:var(--text);
+      background:#182332;transition:.18s ease}
+    .btn:hover{transform:translateY(-1px);border-color:#52667d}
+    .btn.primary{background:var(--accent);color:#16120c;border-color:var(--accent);font-weight:800}
+    .btn.ghost{background:transparent}.btn.danger{border-color:#70464a;color:#efb4b4;background:#27191c}
+    .btn.small{padding:6px 10px;font-size:.88rem}
+    .hero{min-height:68vh;display:grid;place-items:center;text-align:center;padding:54px 10px}
+    .hero-inner{max-width:800px}.eyebrow{color:var(--accent);letter-spacing:.2em;font-weight:800;font-size:.84rem}
+    h1{font-size:clamp(2.5rem,8vw,5.4rem);line-height:1.03;margin:.4em 0 .25em;font-family:Georgia,"Noto Serif KR",serif}
+    h2{font-size:clamp(1.55rem,4vw,2.25rem);margin:.2em 0 .7em}h3{margin:.2em 0 .65em}
+    p{margin:.4em 0 1em}.lead{font-size:1.08rem;color:#cad5e0}
+    .mode-grid,.grid{display:grid;gap:14px}.mode-grid{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:28px}
+    .mode-card,.card{border:1px solid var(--line);border-radius:16px;padding:19px;
+      background:linear-gradient(145deg,rgba(27,39,54,.96),rgba(15,23,33,.98));box-shadow:var(--shadow)}
+    .mode-card{text-align:left;transition:.18s ease}.mode-card:hover{border-color:#62768e;transform:translateY(-2px)}
+    .mode-card.selected{outline:2px solid var(--accent);border-color:transparent}
+    .tag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 9px;margin:2px 4px 2px 0;
+      font-size:.78rem;color:#cbd5df;background:#111923}
+    .section{display:none;animation:fade .28s ease}.section.active{display:block}
+    @keyframes fade{from{opacity:.25;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .chapter-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin:34px 0 18px;
+      padding-bottom:13px;border-bottom:1px solid var(--line)}
+    .chapter-num{color:var(--accent);font-size:.8rem;font-weight:800;letter-spacing:.14em}.muted{color:var(--muted)}
+    .notice{border-left:4px solid var(--accent);padding:13px 15px;background:#191d20;border-radius:0 12px 12px 0}
+    .warning{border-left-color:var(--danger);background:#261b1e}.success{border-left-color:var(--ok);background:#15241e}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .suspect{position:relative;overflow:hidden}.suspect::after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;
+      right:-30px;top:-35px;background:rgba(201,169,110,.07)}
+    .name{font-size:1.3rem;font-weight:900}.role{color:var(--accent2);font-size:.92rem}
+    .evidence-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    details.evidence{border:1px solid var(--line);border-radius:14px;background:#111923;overflow:hidden}
+    details.evidence[open]{border-color:#496078}
+    details.evidence summary{padding:15px 17px;list-style:none;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    details.evidence summary::-webkit-details-marker{display:none}
+    .ev-body{padding:0 17px 17px;border-top:1px solid var(--line);color:#d8e1ea}
+    .ev-code{color:var(--accent);font-family:ui-monospace,monospace;font-size:.82rem}
+    .doc{background:#e9e4d9;color:#26231e;border-radius:8px;padding:18px;font-family:"Noto Serif KR",Georgia,serif;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+    .doc table{width:100%;border-collapse:collapse;font-family:ui-monospace,monospace;font-size:.89rem}
+    .doc th,.doc td{padding:7px;border-bottom:1px solid #b9b0a2;text-align:left}
+    .photo{min-height:220px;border-radius:10px;padding:18px;position:relative;overflow:hidden;
+      background:linear-gradient(135deg,#34373c,#161a1f);color:#e7edf2}
+    .room-map{display:grid;grid-template-columns:1fr .9fr 1.1fr;gap:8px;margin-top:12px}
+    .room{border:1px solid #8794a4;min-height:100px;padding:10px;background:#242c36}
+    .room.corridor{grid-column:1/-1;min-height:55px;background:#1a222c}
+    .timeline{display:grid;grid-template-columns:90px 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    .timeline div{padding:10px 12px;border-bottom:1px solid var(--line)}
+    .timeline div:nth-child(odd){color:var(--accent);font-weight:800;background:#121b27}
+    .timeline div:nth-child(even){background:#0f1721}
+    .task{padding:16px;border:1px dashed #52677e;border-radius:12px;background:#101823;margin:16px 0}
+    .task label{display:block;font-weight:800;margin-bottom:7px}
+    input[type=text],select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;background:#091019;color:var(--text);padding:11px 12px}
+    textarea{min-height:110px;resize:vertical}.answer-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+    .feedback{font-size:.91rem;margin-top:7px;min-height:1.3em}.correct{color:var(--ok)}.wrong{color:#e7a4a4}
+    .locked{filter:blur(7px);user-select:none;pointer-events:none;opacity:.58}.lockbox{text-align:center;padding:22px}
+    .progress-wrap{height:7px;background:#101720;border-radius:999px;overflow:hidden;min-width:120px}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#e4d0a1);width:0%;transition:.3s}
+    .timer{font-family:ui-monospace,monospace;color:#d6e6f2;font-weight:800}
+    .sidebar-note{position:fixed;right:18px;bottom:18px;z-index:30;width:min(380px,calc(100vw - 36px));display:none;
+      background:#0d151f;border:1px solid #40546a;border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+    .sidebar-note.open{display:block}.note-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+    .hint details{background:#171d26;border:1px solid #39495c;border-radius:10px;margin:8px 0;padding:10px 12px}
+    .hint summary{cursor:pointer;font-weight:800;color:#d8c394}.checklist label{display:block;padding:7px 0}
+    .final-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.score{font-size:3.3rem;font-weight:900;color:var(--accent);font-family:Georgia,serif}
+    .solution{display:none}.solution.revealed{display:block}.footer{text-align:center;color:#718096;margin-top:60px}.hidden{display:none!important}
+    @media(max-width:760px){.mode-grid,.grid.two,.grid.three,.evidence-grid,.final-grid{grid-template-columns:1fr}
+      .topbar{align-items:flex-start}.tools{justify-content:flex-end}.chapter-head{display:block}.room-map{grid-template-columns:1fr}.room.corridor{grid-column:auto}}
+    @media print{.topbar,.btn,.sidebar-note,.hero{display:none!important}body{background:#fff;color:#111}.section{display:block!important}
+      .card,details.evidence{box-shadow:none;background:#fff;color:#111;border-color:#aaa}details.evidence .ev-body{display:block}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand"><span class="snow">❄</span> 눈 내리는 13층</div>
+    <div class="tools">
+      <span class="timer" id="timer">00:00:00</span>
+      <button class="btn small" onclick="toggleTimer()" id="timerBtn">타이머 시작</button>
+      <button class="btn small" onclick="toggleNotes()">수사 노트</button>
+      <button class="btn small ghost" onclick="resetGame()">초기화</button>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+  </header>
+  <main>
+    <section class="section active" id="start">
+      <div class="hero"><div class="hero-inner">
+        <div class="eyebrow">SOLO MURDER MYSTERY</div>
+        <h1>눈 내리는<br>13층</h1>
+        <p class="lead">폭설로 고립된 산장 호텔. 자정의 폭로를 예고했던 미술재단 이사장이 차가운 도서실에서 숨진 채 발견됐다. 용의자는 다섯 명, 그리고 모두가 거짓말을 하고 있다.</p>
+        <div class="mode-grid">
+          <button class="mode-card selected" id="modeFocused" onclick="chooseMode('focused')">
+            <div class="tag">1~2시간</div><h3>집중 수사</h3>
+            <p class="muted">살인범·범행 방법·동기를 추리합니다. 핵심 증거 18개와 단계별 힌트를 사용합니다.</p>
+          </button>
+          <button class="mode-card" id="modeDeep" onclick="chooseMode('deep')">
+            <div class="tag">2~3시간</div><h3>완전 수사</h3>
+            <p class="muted">살인사건뿐 아니라 검은 장부를 훔친 사람과 별도의 은폐 행위까지 밝혀냅니다. 보조 자료 8개가 추가됩니다.</p>
+          </button>
+        </div>
+        <p class="muted" style="margin-top:18px">이어폰 없이 플레이할 수 있으며, 모든 단서는 이 파일 안에 있습니다. 메모지 사용을 권장합니다.</p>
+        <button class="btn primary" onclick="beginGame()">사건 파일 열기</button>
+      </div></div>
+    </section>
+
+    <section class="section" id="briefing">
+      <div class="chapter-head">
+        <div><div class="chapter-num">CASE BRIEFING</div><h2>사건 개요</h2></div><div class="muted">2028년 12월 14일 · 설림호텔</div>
+      </div>
+      <div class="grid two">
+        <article class="card">
+          <h3>사건</h3>
+          <p>미술재단 이사장 <strong>남경태(61)</strong>는 설림호텔 재개장 행사에 다섯 사람을 초대했다. 그는 밤 11시 30분, 재단이 보유한 명화 한 점의 위작 의혹과 관련해 “진짜 책임자의 이름”을 공개하겠다고 예고했다.</p>
+          <p>그러나 11시 24분, 그는 13층 도서실의 안락의자에서 의식을 잃은 채 발견되었고 곧 사망했다. 탁자에는 반쯤 마신 무카페인 홍차, 바닥에는 깨진 약병이 있었다.</p>
+        </article>
+        <article class="card">
+          <h3>당신의 임무</h3>
+          <p><strong>① 누가 남경태를 죽였는가?</strong></p>
+          <p><strong>② 어떤 방법으로 살해했는가?</strong></p>
+          <p><strong>③ 왜 그를 죽였는가?</strong></p>
+          <p class="deepOnly hidden"><strong>④ 검은 장부를 가져간 사람은 누구이며, 살인과 어떤 관계가 있는가?</strong></p>
+        </article>
+      </div>
+      <div class="notice"><strong>공정한 추리 원칙</strong><br>범인을 특정하는 데 필요한 정보는 모두 증거 안에 있습니다. 용의자들의 거짓말이 곧 살인을 뜻하지는 않습니다. 동기, 기회, 수단을 따로 검토하세요.</div>
+      <div class="task checklist">
+        <label><input type="checkbox"> 증거는 번호 순서가 아니라 서로 연결해서 본다.</label>
+        <label><input type="checkbox"> ‘사건 이후의 은폐’와 ‘살해 행위’를 구분한다.</label>
+        <label><input type="checkbox"> 정답 해설은 최종 추리 전에는 열지 않는다.</label>
+      </div>
+      <button class="btn primary" onclick="goSection('suspects',15)">용의자 파일 확인</button>
+    </section>
+
+    <section class="section" id="suspects">
+      <div class="chapter-head"><div><div class="chapter-num">CHAPTER 1</div><h2>다섯 명의 초대객</h2></div><div class="muted">각자에게 감출 이유가 있다.</div></div>
+      <div class="grid three">
+        <article class="card suspect"><div class="name">서유나</div><div class="role">피해자의 딸 · 피아니스트</div><p>행사 연주자. 아버지와 상속 문제로 다퉜다. 22:50~23:18 연회장에서 피아노를 연주했다.</p><span class="tag">상속 분쟁</span><span class="tag">무대 알리바이</span></article>
+        <article class="card suspect"><div class="name">한지호</div><div class="role">재단 수석 큐레이터</div><p>남경태와 14년간 일했다. 위작 감정과 전시 이력 관리를 총괄한다. 사건 당시 12층 자료실에 있었다고 주장한다.</p><span class="tag">위작 책임</span><span class="tag">복원 지식</span></article>
+        <article class="card suspect"><div class="name">김민석</div><div class="role">탐사보도 기자</div><p>남경태 재단의 비리를 취재 중이었다. 피해자가 자신의 아버지를 몰락시켰다고 믿는다. 23시 무렵 호텔 밖 통화 중이었다고 말한다.</p><span class="tag">오랜 원한</span><span class="tag">비밀 취재</span></article>
+        <article class="card suspect"><div class="name">오세라</div><div class="role">설림호텔 총지배인</div><p>재개장을 책임졌다. 남경태의 개발 사업 때문에 고향 마을이 사라질 위기다. 13층 마스터키 권한을 보유한다.</p><span class="tag">토지 갈등</span><span class="tag">마스터키</span></article>
+        <article class="card suspect"><div class="name">류태겸</div><div class="role">내과 의사 · 피해자의 오랜 친구</div><p>현장에서 응급처치를 시행했다. 남경태의 복용약과 지병을 가장 잘 안다. 과거 의료기록 문제로 피해자에게 약점을 잡혔다.</p><span class="tag">의학 지식</span><span class="tag">과거의 비밀</span></article>
+      </div>
+      <div class="task"><label for="firstImpression">초기 인상: 가장 의심되는 사람과 이유</label><textarea id="firstImpression" data-save placeholder="첫인상은 틀려도 괜찮습니다. 나중에 비교할 수 있도록 기록하세요."></textarea></div>
+      <button class="btn primary" onclick="goSection('scene',28)">현장 조사 시작</button>
+    </section>
+
+    <section class="section" id="scene">
+      <div class="chapter-head"><div><div class="chapter-num">CHAPTER 2</div><h2>13층 도서실</h2></div><div class="muted">첫 번째 증거 묶음</div></div>
+      <div class="evidence-grid">
+        <details class="evidence"><summary><span><span class="ev-code">E-01</span> 현장 배치도</span><span>열기</span></summary><div class="ev-body">
+          <div class="photo"><strong>13층 약식 배치도</strong><div class="room-map">
+            <div class="room">1307호<br><span class="muted">남경태 객실</span></div><div class="room">도서실<br><span class="muted">발견 장소</span></div><div class="room">서비스실<br><span class="muted">직원 전용</span></div><div class="room corridor">복도 — 엘리베이터 / 비상계단 방향</div>
+          </div></div><p>도서실 출입문은 일반 잠금장치이며, 안팎에서 모두 열 수 있다. 밀실은 아니다. 객실과 도서실 사이는 도보 약 35초다.</p>
+        </div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-02</span> 최초 현장 사진 기록</span><span>열기</span></summary><div class="ev-body"><div class="doc">
+          <p>피해자는 안락의자에 기대어 있었다. 오른손 아래에 개인용 약병이 깨져 있었고, 탁자 위에는 홍차와 물잔이 놓여 있었다.</p>
+          <p>홍차 잔 손잡이는 왼쪽을 향했다. 피해자의 스마트폰은 재킷 안주머니에서 발견됐다. 검은색 서류철이 들어갔을 것으로 보이는 빈 가죽 가방이 소파 아래 있었다.</p>
+        </div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-03</span> 예비 검시 소견</span><span>열기</span></summary><div class="ev-body"><div class="doc">
+          <p><strong>추정 사망 시각:</strong> 23:14~23:24</p><p><strong>직접 사인:</strong> 급성 중독에 따른 심정지</p><p>외상은 없으며, 홍차와 물에서는 원인 물질이 검출되지 않았다. 위 내용물에서 약 캡슐의 외피 조각이 확인됐다.</p>
+        </div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-04</span> 피해자의 복약 습관</span><span>열기</span></summary><div class="ev-body">
+          <p>피해자는 매일 밤 11시 전후, 무카페인 차를 마신 뒤 개인 약병에서 심장약 한 캡슐을 꺼내 복용했다. 행사 전 비서에게 “오늘도 도서실에서 차를 마시고 약을 먹겠다”고 말했다.</p><p class="muted">이 습관을 확실히 알고 있던 사람: 서유나, 한지호, 류태겸. 호텔 측에는 차 주문만 전달됐다.</p>
+        </div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-05</span> 찻잔과 약병 감식</span><span>열기</span></summary><div class="ev-body"><ul>
+          <li>찻잔: 피해자와 오세라의 지문. 오세라는 직접 차를 가져왔다고 진술했다.</li><li>깨진 약병: 피해자 지문만 선명하게 검출.</li><li>병 내부: 정상 약 캡슐 5개, 내용물이 다른 캡슐 외피 파편 1개.</li><li>병마개 나사산: 짙은 청색의 미세한 왁스 입자.</li>
+        </ul></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-06</span> 객실 정비 기록</span><span>열기</span></summary><div class="ev-body"><div class="doc"><table>
+          <tr><th>시각</th><th>기록</th></tr><tr><td>17:31</td><td>하우스키핑 직원 1307호 입실</td></tr><tr><td>17:34</td><td>침구 카트 이동을 위해 문 고정장치 사용</td></tr><tr><td>17:48</td><td>정비 완료 및 퇴실</td></tr>
+        </table></div><p>문이 고정된 동안에는 키카드 없이도 객실 출입이 가능했다. 복도 카메라는 폭설로 인한 통신 장애로 17:36~17:44 영상이 누락됐다.</p></div></details>
+      </div>
+      <div class="task"><label>중간 판단 1: 독은 어디에 있었는가?</label><div class="answer-row"><select id="poisonLocation">
+        <option value="">선택</option><option value="tea">홍차</option><option value="water">물</option><option value="capsule">약 캡슐</option><option value="air">도서실 공기</option>
+      </select><button class="btn" onclick="checkPoison()">확인</button></div><div class="feedback" id="poisonFeedback"></div></div>
+      <div id="sceneNext" class="lockbox locked"><p>중간 판단을 맞히면 다음 자료가 열립니다.</p><button class="btn primary" onclick="goSection('logs',46)">호텔 기록 조사</button></div>
+    </section>
+
+    <section class="section" id="logs">
+      <div class="chapter-head"><div><div class="chapter-num">CHAPTER 3</div><h2>호텔의 기록</h2></div><div class="muted">기회와 알리바이</div></div>
+      <div class="evidence-grid">
+        <details class="evidence"><summary><span><span class="ev-code">E-07</span> 13층 키카드 로그</span><span>열기</span></summary><div class="ev-body"><div class="doc"><table>
+          <tr><th>시각</th><th>카드</th><th>장소</th></tr><tr><td>17:31</td><td>하우스키핑</td><td>1307호</td></tr><tr><td>22:41</td><td>남경태</td><td>1307호</td></tr><tr><td>22:56</td><td>오세라 마스터</td><td>도서실</td></tr><tr><td>23:22</td><td>오세라 마스터</td><td>도서실</td></tr>
+        </table></div><p>17:34~17:48에는 문이 물리적으로 고정되어 있어 1307호의 추가 카드 기록이 없다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-08</span> 서비스 엘리베이터 센서</span><span>열기</span></summary><div class="ev-body"><div class="doc"><table>
+          <tr><th>시각</th><th>이동</th><th>비고</th></tr><tr><td>17:37</td><td>12층 → 13층</td><td>승객 1명 추정</td></tr><tr><td>17:43</td><td>13층 → 12층</td><td>승객 1명 추정</td></tr><tr><td>22:52</td><td>1층 → 13층</td><td>차 트레이 포함</td></tr>
+        </table></div><p>17시대 서비스 엘리베이터는 원래 직원 전용이지만, 재단 관계자에게 발급된 임시 직원 배지로도 작동한다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-09</span> 연회장 사진</span><span>열기</span></summary><div class="ev-body"><div class="photo">
+          <p><strong>17:39 촬영</strong></p><p>서유나가 피아노 리허설 중이다. 오세라는 무대 옆에서 직원과 대화한다. 류태겸은 앞줄에 앉아 있다. 김민석은 창가에서 통화 중이다.</p><p>한지호의 좌석에는 코트와 서류가방만 놓여 있다.</p>
+        </div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-10</span> 한지호의 진술</span><span>열기</span></summary><div class="ev-body">
+          <blockquote>“오후 리허설 때는 계속 연회장에 있었습니다. 17시 30분쯤 남 이사장과 잠깐 언쟁한 뒤 제 자리에 돌아왔고, 18시가 될 때까지 자리를 뜨지 않았습니다.”</blockquote><p>그는 사건 당일 짙은 남색 수트와 검은 구두를 착용했다.</p>
+        </div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-11</span> 임시 직원 배지 기록</span><span>열기</span></summary><div class="ev-body"><div class="doc"><table>
+          <tr><th>배지</th><th>소지자</th><th>마지막 사용</th></tr><tr><td>T-14</td><td>한지호</td><td>17:43 서비스 엘리베이터</td></tr><tr><td>T-21</td><td>김민석</td><td>16:55 자료실</td></tr><tr><td>T-30</td><td>류태겸</td><td>17:12 의료실</td></tr>
+        </table></div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-12</span> 밤 11시 전후 동선</span><span>열기</span></summary><div class="ev-body"><div class="timeline">
+          <div>22:50</div><div>서유나, 연회장 피아노 연주 시작</div><div>22:52</div><div>오세라, 차 트레이를 들고 13층 이동</div><div>22:56</div><div>오세라, 도서실에 차를 놓고 퇴실</div><div>23:02</div><div>남경태가 기자 김민석에게 “곧 보자” 문자 발송</div><div>23:06</div><div>한지호, 12층 프린터에서 문서 출력</div><div>23:13</div><div>류태겸, 연회장 바에서 결제</div><div>23:18</div><div>서유나의 연주 종료</div><div>23:22</div><div>오세라, 도서실에서 쓰러진 피해자 발견</div>
+        </div></div></details>
+      </div>
+      <div class="task"><label for="timelineNote">17시 37분부터 17시 43분 사이, 객실에 접근했을 가능성이 가장 높은 사람은 누구인가? 근거도 적어두세요.</label><textarea id="timelineNote" data-save placeholder="인물 / 로그 / 진술의 모순"></textarea></div>
+      <button class="btn primary" onclick="goSection('materials',65)">물질과 문서 분석</button>
+    </section>
+
+    <section class="section" id="materials">
+      <div class="chapter-head"><div><div class="chapter-num">CHAPTER 4</div><h2>남겨진 미세 흔적</h2></div><div class="muted">수단과 동기</div></div>
+      <div class="evidence-grid">
+        <details class="evidence"><summary><span><span class="ev-code">E-13</span> 청색 왁스 분석</span><span>열기</span></summary><div class="ev-body"><div class="doc">
+          <p>약병 마개에서 나온 입자는 일반 양초가 아니라 미술품 보존 작업에 쓰이는 미세결정 왁스다. 청색 안료가 혼합된 특수 배합으로, 재단 복원실이 액자 봉인 표시용으로 주문 제작했다.</p><p>최근 6개월간 이 왁스를 사용한 기록은 수석 큐레이터 한지호의 작업대에서만 확인된다.</p>
+        </div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-14</span> 복원실 재고표</span><span>열기</span></summary><div class="ev-body"><div class="doc"><table>
+          <tr><th>품목</th><th>정상 재고</th><th>실재고</th></tr><tr><td>청색 봉인 왁스</td><td>3통</td><td>3통</td></tr><tr><td>분석용 표준 시약 A</td><td>10앰풀</td><td>9앰풀</td></tr><tr><td>보존 용제 B</td><td>6병</td><td>6병</td></tr>
+        </table></div><p>사라진 표준 시약 A는 인체에 치명적일 수 있지만, 외관만으로는 정상 약 분말과 구분하기 어렵다. 구체적인 취급법은 파일에 포함되지 않는다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-15</span> 위작 감정 초안</span><span>열기</span></summary><div class="ev-body"><div class="doc">
+          <p>작품명: 《겨울의 정원》</p><p>기존 감정 책임자: 한지호</p><p>재검사 결과, 안료층의 연대와 소장 이력이 맞지 않는다. 최초 감정서의 현미경 사진 두 장이 다른 작품의 사진으로 대체되어 있다.</p><p>남경태의 자필 메모: “오늘 밤 공개. 한지호 단독 책임으로 정리할 것.”</p>
+        </div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-16</span> 삭제된 메일 복구</span><span>열기</span></summary><div class="ev-body"><div class="doc">
+          <p><strong>발신:</strong> 한지호 → 남경태</p><p><strong>제목:</strong> 감정서 원본에 관하여</p><p>“사진 교체는 이사장님의 지시에 따른 것이었습니다. 이제 와서 저 혼자 한 일로 발표한다면, 관련 지시가 담긴 검은 장부를 공개하겠습니다.”</p>
+        </div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-17</span> 객실 쓰레기통 감식</span><span>열기</span></summary><div class="ev-body"><ul>
+          <li>정상 캡슐 1개의 찢어진 외피 포장</li><li>청색 왁스가 묻은 얇은 면장갑 섬유 2가닥</li><li>호텔 메모지 조각: “17:30 이후 방 비움. 장부는 가방에.”</li>
+        </ul><p>쓰레기통은 17시 31분 객실 정비 전에 비워졌으므로, 위 물품은 그 이후 버려졌다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">E-18</span> 피해자의 마지막 메모</span><span>열기</span></summary><div class="ev-body"><div class="doc">
+          <p>“폭로 전에 장부를 도서실로 가져간다. 지호가 자신만 살려고 하면 원본을 보여줄 것. 유나에게는 아직 말하지 않는다.”</p><p>이 메모는 피해자의 휴대전화에 22:38 저장되었다.</p>
+        </div></div></details>
+      </div>
+      <div class="task"><label for="murderTheory">현재까지의 살인 가설</label><textarea id="murderTheory" data-save placeholder="범인 / 약병에 손댄 시점 / 독이 작동한 시점 / 동기 / 결정적 증거"></textarea></div>
+      <div class="hint"><h3>선택 힌트</h3>
+        <details><summary>힌트 1 — 막혔을 때</summary><p>살인이 실행된 시각과 피해자가 사망한 시각은 같지 않을 수 있습니다.</p></details>
+        <details><summary>힌트 2 — 범위를 좁히기</summary><p>17시대 객실 접근 가능성, 약병의 미세 흔적, 사라진 복원실 물질을 한 줄로 연결해 보세요.</p></details>
+        <details><summary>힌트 3 — 강한 힌트</summary><p>밤 11시 알리바이는 약병이 이미 바뀐 뒤의 기록입니다. 그 시각에 범인이 피해자 곁에 있을 필요는 없습니다.</p></details>
+      </div>
+      <button class="btn primary focusedOnly" onclick="goSection('final',84)">최종 추리 작성</button>
+      <button class="btn primary deepOnly hidden" onclick="goSection('deepcase',78)">검은 장부 수사 계속</button>
+    </section>
+
+    <section class="section deepOnly hidden" id="deepcase">
+      <div class="chapter-head"><div><div class="chapter-num">EXTRA CHAPTER</div><h2>사라진 검은 장부</h2></div><div class="muted">완전 수사 전용</div></div>
+      <div class="notice">살인범을 추리하는 것과 별개로, 발견 당시 피해자의 가방은 비어 있었습니다. 누군가 사망 전후에 검은 장부를 가져갔습니다.</div>
+      <div class="evidence-grid">
+        <details class="evidence"><summary><span><span class="ev-code">X-01</span> 오세라의 마스터키 기록</span><span>열기</span></summary><div class="ev-body"><p>오세라는 22:56 차를 놓은 뒤 23:22 다시 도서실에 들어갔다. 첫 방문 당시 피해자는 살아 있었으며 가죽 가방은 소파 옆에 있었다고 진술했다. 두 번째 방문 직전, 복도에서 누군가 급히 계단으로 내려가는 소리를 들었다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">X-02</span> 비상계단 문 센서</span><span>열기</span></summary><div class="ev-body"><div class="doc"><table><tr><th>시각</th><th>층</th><th>상태</th></tr><tr><td>23:19:42</td><td>13층</td><td>열림</td></tr><tr><td>23:20:08</td><td>12층</td><td>열림</td></tr></table></div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">X-03</span> 서유나 연주 영상</span><span>열기</span></summary><div class="ev-body"><p>연주는 23:18:11에 끝난다. 유나는 인사를 마친 뒤 23:18:46 무대 오른쪽 출입구로 나간다. 그녀는 23:25 다시 연회장에 나타난다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">X-04</span> 서유나의 메시지</span><span>열기</span></summary><div class="ev-body"><div class="doc"><p><strong>22:44 남경태 → 서유나</strong></p><p>“네 어머니에게 약속했던 돈이 어디로 갔는지 알고 싶다면, 공연 후 검은 장부를 보아라. 도서실 가방 안에 둔다.”</p></div></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">X-05</span> 드레스 밑단 섬유</span><span>열기</span></summary><div class="ev-body"><p>서유나의 드레스 밑단에서 13층 비상계단의 오래된 황마 매트 섬유가 발견됐다. 그녀는 “연회장 밖으로 나가지 않았다”고 진술했다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">X-06</span> 김민석의 녹음기</span><span>열기</span></summary><div class="ev-body"><p>23:19 무렵 12층 계단참에서 구두 굽 소리와 종이 가방이 접히는 소리가 녹음됐다. 이어 여성의 숨소리와 “엄마 이름이 왜 여기 있어…”라는 작은 목소리가 담겼다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">X-07</span> 류태겸의 의료기록 은폐</span><span>열기</span></summary><div class="ev-body"><p>류태겸은 피해자 사망 직후 휴대전화에서 오래된 의료기록 사진을 삭제했다. 이는 자신의 과거 과실을 숨기기 위한 행동이지만, 장부가 사라진 시간에는 연회장 바 결제와 직원 증언으로 위치가 확인된다.</p></div></details>
+        <details class="evidence"><summary><span><span class="ev-code">X-08</span> 장부의 일부 사본</span><span>열기</span></summary><div class="ev-body"><div class="doc"><p>장부에는 위작 거래뿐 아니라, 남경태가 서유나의 어머니 몫으로 남겨진 신탁금을 재단 운영비로 전용한 기록이 있다.</p><p>한지호에게 불리한 지시 기록과 남경태 본인의 횡령 기록이 함께 존재한다.</p></div></div></details>
+      </div>
+      <div class="task"><label for="ledgerTheory">장부를 가져간 사람, 시각, 목적을 정리하세요.</label><textarea id="ledgerTheory" data-save></textarea></div>
+      <button class="btn primary" onclick="goSection('final',90)">최종 추리 작성</button>
+    </section>
+
+    <section class="section" id="final">
+      <div class="chapter-head"><div><div class="chapter-num">FINAL DEDUCTION</div><h2>최종 수사 보고서</h2></div><div class="muted">제출 후에도 해설은 자동 공개되지 않습니다.</div></div>
+      <div class="final-grid">
+        <div class="card"><label>살인범</label><select id="finalKiller"><option value="">선택</option><option>서유나</option><option>한지호</option><option>김민석</option><option>오세라</option><option>류태겸</option></select></div>
+        <div class="card"><label>범행 방법</label><select id="finalMethod"><option value="">선택</option><option value="tea">홍차에 독성 물질을 넣었다</option><option value="capsule">피해자의 약 캡슐 하나를 바꿔치기했다</option><option value="injection">도서실에서 직접 주사했다</option><option value="air">도서실 환기장치를 조작했다</option></select></div>
+      </div>
+      <div class="task"><label for="finalMotive">동기와 전체 범행 경위</label><textarea id="finalMotive" data-save placeholder="언제 준비했고, 왜 죽였으며, 어떤 증거가 이를 뒷받침하는지 작성하세요."></textarea></div>
+      <div class="task"><label for="finalEvidence">결정적 증거 세 가지</label><textarea id="finalEvidence" data-save></textarea></div>
+      <div class="task deepOnly hidden"><label>검은 장부를 가져간 사람</label><select id="finalLedger"><option value="">선택</option><option>서유나</option><option>한지호</option><option>김민석</option><option>오세라</option><option>류태겸</option></select></div>
+      <button class="btn primary" onclick="submitDeduction()">수사 보고서 제출</button><div id="submissionResult"></div>
+    </section>
+
+    <section class="section" id="result">
+      <div class="chapter-head"><div><div class="chapter-num">CASE RESULT</div><h2>수사 평가</h2></div></div>
+      <div class="grid two">
+        <article class="card"><div class="score" id="scoreText">0</div><p id="scoreDesc"></p></article>
+        <article class="card"><h3>해설 공개 전 확인</h3><p>아직 수정하고 싶다면 이전 장으로 돌아갈 수 있습니다. 해설에는 범인과 모든 부수적 비밀이 포함됩니다.</p><input type="text" id="revealPhrase" placeholder="해설공개 입력"><button class="btn danger" onclick="revealSolution()" style="margin-top:9px">정답과 해설 공개</button></article>
+      </div>
+      <div class="solution" id="solution">
+        <div class="notice success"><h2>정답: 살인범은 한지호</h2><p>한지호는 오후 17시 37분 임시 직원 배지로 서비스 엘리베이터를 타고 13층에 올라가, 정비를 위해 열려 있던 1307호에 들어갔다. 그는 피해자의 개인 약병을 열어 정상 캡슐 하나를 제거하고, 복원실에서 가져온 독성 표준 물질을 넣은 캡슐로 바꿨다.</p></div>
+        <article class="card"><h3>범행의 전체 흐름</h3><div class="timeline">
+          <div>17:30</div><div>남경태와 한지호가 위작 폭로 문제로 언쟁한다.</div><div>17:37</div><div>한지호가 서비스 엘리베이터를 타고 13층으로 이동한다.</div><div>17:37~43</div><div>열려 있던 1307호에 들어가 약 캡슐을 바꿔치기하고 증거 일부를 쓰레기통에 버린다.</div><div>17:43</div><div>한지호가 12층으로 돌아가 연회장에 계속 있었다고 거짓말한다.</div><div>22:56</div><div>오세라가 도서실에 차를 놓는다. 차는 독과 무관하다.</div><div>23시경</div><div>남경태가 평소 습관대로 차를 마신 뒤 바뀐 캡슐을 복용한다.</div><div>23:14~24</div><div>독성 물질의 영향으로 피해자가 사망한다. 한지호는 그 시각 12층에 있어 겉보기 알리바이를 얻는다.</div>
+        </div></article>
+        <div class="grid two">
+          <article class="card"><h3>결정적 증거</h3><ol><li><strong>배지·엘리베이터 기록:</strong> 한지호가 거짓 진술과 달리 17:37~17:43에 13층을 왕복했다.</li><li><strong>청색 왁스:</strong> 약병 마개와 객실 쓰레기에서 한지호 작업대의 특수 보존 왁스가 검출됐다.</li><li><strong>사라진 시약:</strong> 복원실에서 치명적 표준 물질 한 개가 없어졌다.</li><li><strong>동기:</strong> 남경태는 자신이 지시한 위작 조작을 한지호 단독 책임으로 발표하려 했다.</li></ol></article>
+          <article class="card"><h3>왜 밤 11시 알리바이는 무의미한가</h3><p>한지호는 피해자가 사망할 때 도서실에 있을 필요가 없었다. 살인은 오후에 준비됐고 피해자는 자신의 습관에 따라 스스로 바뀐 캡슐을 복용했다. 따라서 밤 11시의 프린터 기록은 살인 기회를 부정하지 않는다.</p></article>
+        </div>
+        <article class="card deepOnly hidden"><h3>검은 장부의 진실</h3><p><strong>장부를 가져간 사람은 서유나</strong>다. 그녀는 연주가 끝난 23:18 직후 아버지의 메시지를 보고 13층으로 올라갔다. 이미 의식을 잃은 아버지를 발견했지만 도움을 청하기보다 가방에서 장부를 꺼내 비상계단으로 내려왔다.</p><p>비상계단 센서, 드레스의 황마 섬유, 김민석 녹음기의 여성 목소리가 이를 뒷받침한다. 유나는 살인범이 아니지만, 어머니의 신탁금 횡령 기록을 확보하기 위해 현장을 떠났고 “연회장 밖에 나가지 않았다”고 거짓말했다.</p></article>
+        <article class="card"><h3>다른 용의자들의 거짓말</h3><ul><li><strong>서유나:</strong> 완전 수사 기준 장부를 가져간 일을 숨겼다. 살인은 하지 않았다.</li><li><strong>김민석:</strong> 비공식 취재와 녹음을 숨겼다. 12층 계단참에 있었기 때문에 13층 범행 준비와 무관하다.</li><li><strong>오세라:</strong> 개발 반대 문서를 피해자 가방에 넣으려 했고, 차를 직접 운반한 사실 때문에 의심받을까 두려워 일부 진술을 늦췄다.</li><li><strong>류태겸:</strong> 과거 의료 과실 자료를 삭제했다. 그러나 독성 물질과 약병 교체를 연결하는 물증은 없다.</li></ul></article>
+      </div>
+      <div style="margin-top:20px"><button class="btn" onclick="goSection('final',96)">최종 보고서 다시 보기</button><button class="btn" onclick="window.print()">사건 파일 인쇄</button></div>
+    </section>
+  </main>
+  <aside class="sidebar-note" id="notesPanel"><div class="note-head"><strong>개인 수사 노트</strong><button class="btn small" onclick="toggleNotes()">닫기</button></div><textarea id="globalNotes" data-save placeholder="타임라인, 의심점, 증거 연결을 자유롭게 적으세요."></textarea></aside>
+  <div class="footer">본 작품은 허구입니다. 실제 인물·단체·사건과 관련이 없습니다.</div>
+</div>
+<script>
+  const state={mode:localStorage.getItem('snow13_mode')||'focused',seconds:Number(localStorage.getItem('snow13_seconds')||0),timerRunning:false,timerId:null,progress:Number(localStorage.getItem('snow13_progress')||0)};
+  function chooseMode(mode){state.mode=mode;localStorage.setItem('snow13_mode',mode);document.getElementById('modeFocused').classList.toggle('selected',mode==='focused');document.getElementById('modeDeep').classList.toggle('selected',mode==='deep')}
+  function applyMode(){const deep=state.mode==='deep';document.querySelectorAll('.deepOnly').forEach(el=>el.classList.toggle('hidden',!deep));document.querySelectorAll('.focusedOnly').forEach(el=>el.classList.toggle('hidden',deep))}
+  function beginGame(){applyMode();goSection('briefing',8);if(!state.timerRunning)toggleTimer()}
+  function goSection(id,progress){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');state.progress=Math.max(state.progress,progress||0);localStorage.setItem('snow13_progress',state.progress);document.getElementById('progressBar').style.width=state.progress+'%';window.scrollTo({top:0,behavior:'smooth'})}
+  function checkPoison(){const val=document.getElementById('poisonLocation').value,fb=document.getElementById('poisonFeedback'),next=document.getElementById('sceneNext');if(val==='capsule'){fb.textContent='맞습니다. 차와 물은 무관하며, 피해자가 복용한 캡슐 하나가 바뀌어 있었습니다.';fb.className='feedback correct';next.classList.remove('locked')}else if(!val){fb.textContent='하나를 선택하세요.';fb.className='feedback wrong'}else{fb.textContent='검시 소견과 약병 감식 결과를 다시 비교해 보세요.';fb.className='feedback wrong'}}
+  function submitDeduction(){const killer=document.getElementById('finalKiller').value,method=document.getElementById('finalMethod').value,ledger=document.getElementById('finalLedger')?.value||'';let score=0;if(killer==='한지호')score+=50;if(method==='capsule')score+=30;if(state.mode==='deep'&&ledger==='서유나')score+=20;if(state.mode==='focused')score+=20;localStorage.setItem('snow13_score',score);document.getElementById('scoreText').textContent=score+'점';document.getElementById('scoreDesc').textContent=score===100?'사건의 구조를 정확히 밝혔습니다.':score>=80?'핵심 진상에 매우 근접했습니다.':score>=50?'범행의 일부를 밝혔지만 재검토가 필요합니다.':'증거를 다시 연결해 볼 필요가 있습니다.';goSection('result',96)}
+  function revealSolution(){if(document.getElementById('revealPhrase').value.trim()!=='해설공개'){alert('입력란에 “해설공개”를 정확히 입력하세요.');return}document.getElementById('solution').classList.add('revealed');state.progress=100;localStorage.setItem('snow13_progress','100');document.getElementById('progressBar').style.width='100%';if(state.timerRunning)toggleTimer();setTimeout(()=>document.getElementById('solution').scrollIntoView({behavior:'smooth'}),100)}
+  function toggleNotes(){document.getElementById('notesPanel').classList.toggle('open')}
+  function formatTime(sec){const h=String(Math.floor(sec/3600)).padStart(2,'0'),m=String(Math.floor((sec%3600)/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');return `${h}:${m}:${s}`}
+  function toggleTimer(){state.timerRunning=!state.timerRunning;const btn=document.getElementById('timerBtn');if(state.timerRunning){btn.textContent='일시정지';state.timerId=setInterval(()=>{state.seconds++;localStorage.setItem('snow13_seconds',state.seconds);document.getElementById('timer').textContent=formatTime(state.seconds)},1000)}else{btn.textContent='타이머 시작';clearInterval(state.timerId)}}
+  function bindAutosave(){document.querySelectorAll('[data-save]').forEach(el=>{const key='snow13_'+el.id,saved=localStorage.getItem(key);if(saved!==null)el.value=saved;el.addEventListener('input',()=>localStorage.setItem(key,el.value))})}
+  function resetGame(){if(!confirm('진행 기록과 수사 노트를 모두 초기화할까요?'))return;Object.keys(localStorage).filter(k=>k.startsWith('snow13_')).forEach(k=>localStorage.removeItem(k));location.reload()}
+  document.addEventListener('DOMContentLoaded',()=>{chooseMode(state.mode);applyMode();bindAutosave();document.getElementById('timer').textContent=formatTime(state.seconds);document.getElementById('progressBar').style.width=state.progress+'%';const savedScore=localStorage.getItem('snow13_score');if(savedScore)document.getElementById('scoreText').textContent=savedScore+'점'})
+</script>
+</body>
+</html>

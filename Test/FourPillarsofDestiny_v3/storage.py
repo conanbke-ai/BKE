@@ -1,0 +1,106 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from dataclasses import asdict, is_dataclass
+from pathlib import Path
+from typing import Any
+
+from config import SETTINGS
+
+
+def _default(value: Any):
+    if is_dataclass(value):
+        return asdict(value)
+    if isinstance(value, Path):
+        return str(value)
+    raise TypeError(type(value).__name__)
+
+
+def write_json(path: Path, data: Any) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2, default=_default), encoding='utf-8')
+    return path
+
+
+def read_json(path: Path, default: Any = None) -> Any:
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text(encoding='utf-8'))
+    except Exception:
+        return default
+
+
+def stable_hash(data: Any) -> str:
+    raw = json.dumps(data, ensure_ascii=False, sort_keys=True, default=_default).encode('utf-8')
+    return hashlib.sha256(raw).hexdigest()
+
+
+
+def _bool_value(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    text = str(value).strip().lower()
+    if text in {'1', 'true', 'yes', 'y', 'on'}:
+        return True
+    if text in {'0', 'false', 'no', 'n', 'off', ''}:
+        return False
+    return default
+
+def canonical_profile_identity(profile_dict: dict[str, Any]) -> dict[str, Any]:
+    """표시 이름과 입력 포맷 차이를 제거한 사람 단위 캐시 키.
+
+    같은 생년월일시/성별/달력/지역이면 이름을 다르게 적어도 같은 원국 자료를
+    재사용한다. 대한민국은 동일 표준시를 사용하므로 도시 입력을 키에 넣지 않는다.
+    출생시간 미상인 경우 내부 날짜변환용 12:00 값도 키에서 제외한다.
+    """
+    code = str(profile_dict.get('country_code') or 'KR').upper().strip()
+    time_known = _bool_value(profile_dict.get('time_known'), True)
+    identity = {
+        'gender': 'F' if str(profile_dict.get('gender', 'F')).upper() == 'F' else 'M',
+        'calendar_type': 'lunar' if str(profile_dict.get('calendar_type', 'solar')).lower() == 'lunar' else 'solar',
+        'year': int(profile_dict.get('year') or 0),
+        'month': int(profile_dict.get('month') or 0),
+        'day': int(profile_dict.get('day') or 0),
+        'time_known': time_known,
+        'hour': int(profile_dict.get('hour') or 0) if time_known else None,
+        'minute': int(profile_dict.get('minute') or 0) if time_known else None,
+        # 윤달 여부는 음력에서만 의미가 있다. 양력 입력의 숨은/과거 UI 값 때문에
+        # 동일 인물이 다른 캐시 키로 갈라지지 않게 정규화한다.
+        'is_leap_month': (
+            _bool_value(profile_dict.get('is_leap_month'), False)
+            if str(profile_dict.get('calendar_type', 'solar')).lower() == 'lunar'
+            else False
+        ),
+        'country_code': code,
+    }
+    if code != 'KR':
+        identity['country'] = str(profile_dict.get('country') or '').strip().casefold()
+        identity['city'] = str(profile_dict.get('city') or '').strip().casefold()
+        identity['location_id'] = str(profile_dict.get('location_id') or '').strip()
+    return identity
+
+
+def profile_key(profile_dict: dict[str, Any]) -> str:
+    return stable_hash(canonical_profile_identity(profile_dict))[:20]
+
+
+def legacy_profile_key(profile_dict: dict[str, Any]) -> str:
+    """2026-08-17 이전 폴더를 찾기 위한 과거 키 형식."""
+    important = {
+        k: profile_dict.get(k) for k in (
+            'name', 'gender', 'calendar_type', 'year', 'month', 'day',
+            'hour', 'minute', 'time_known', 'is_leap_month',
+            'country_code', 'country', 'city', 'location', 'location_id',
+        )
+    }
+    return stable_hash(important)[:20]
+
+
+def cache_path(namespace: str, key: str) -> Path:
+    return SETTINGS.cache_dir / namespace / f'{key}.json'

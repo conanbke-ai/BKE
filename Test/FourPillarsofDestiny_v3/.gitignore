@@ -1,0 +1,11 @@
+.venv/
+venv/
+.env
+.browser-profile/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+data/
+.DS_Store
+Thumbs.db

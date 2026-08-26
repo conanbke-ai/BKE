@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <title>정오의 온실: 사라진 12분 | 5인 머더미스터리</title>
+  <style>
+    :root {
+      --bg: #0d1412;
+      --panel: #14201c;
+      --panel-2: #192a24;
+      --ink: #eef7f1;
+      --muted: #a9beb2;
+      --line: #2b4439;
+      --accent: #9be3b1;
+      --accent-2: #f0c879;
+      --danger: #ff938a;
+      --blue: #9ec9ff;
+      --shadow: 0 18px 45px rgba(0,0,0,.28);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(77, 154, 103, .18), transparent 32rem),
+        radial-gradient(circle at 100% 30%, rgba(60, 110, 139, .14), transparent 28rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: Pretendard, "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+    }
+    button, select, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    .wrap { width: min(1100px, calc(100% - 28px)); margin: 0 auto; }
+    header {
+      padding: 54px 0 30px;
+      border-bottom: 1px solid rgba(155, 227, 177, .15);
+    }
+    .eyebrow { color: var(--accent); font-weight: 800; letter-spacing: .12em; font-size: .78rem; }
+    h1 { margin: 8px 0 10px; font-size: clamp(2.1rem, 6vw, 4.7rem); line-height: 1.08; letter-spacing: -.04em; }
+    .subtitle { max-width: 760px; color: var(--muted); font-size: 1.03rem; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .badge { border: 1px solid var(--line); background: rgba(25,42,36,.7); border-radius: 999px; padding: 6px 11px; font-size: .86rem; color: #dceae1; }
+    nav {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(13,20,18,.84);
+      border-bottom: 1px solid rgba(155, 227, 177, .14);
+    }
+    .nav-inner { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      white-space: nowrap; border: 1px solid transparent; color: var(--muted); background: transparent;
+      padding: 9px 13px; border-radius: 12px; font-weight: 750;
+    }
+    .nav-btn:hover, .nav-btn.active { color: var(--ink); border-color: var(--line); background: var(--panel-2); }
+    main { padding: 28px 0 80px; }
+    section { display: none; animation: fade .22s ease; }
+    section.active { display: block; }
+    @keyframes fade { from { opacity: .25; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      background: linear-gradient(160deg, rgba(25,42,36,.96), rgba(20,32,28,.96));
+      border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+    }
+    .card h2, .card h3, .card h4 { margin-top: 0; }
+    .card h2 { font-size: 1.35rem; }
+    .card h3 { font-size: 1.06rem; }
+    .soft { color: var(--muted); }
+    .accent { color: var(--accent); }
+    .gold { color: var(--accent-2); }
+    .danger { color: var(--danger); }
+    .blue { color: var(--blue); }
+    .notice { border-left: 4px solid var(--accent-2); padding: 12px 14px; background: rgba(240,200,121,.07); border-radius: 8px; }
+    .warning { border-left: 4px solid var(--danger); padding: 12px 14px; background: rgba(255,147,138,.07); border-radius: 8px; }
+    .clean { margin: 0; padding-left: 1.2rem; }
+    .clean li + li { margin-top: 6px; }
+    .timeline { display: grid; gap: 10px; }
+    .time-row { display: grid; grid-template-columns: 74px 1fr; gap: 12px; border-bottom: 1px dashed var(--line); padding: 8px 0; }
+    .time-row:last-child { border-bottom: 0; }
+    .time { color: var(--accent-2); font-weight: 900; }
+    .btn {
+      border: 1px solid var(--line); background: var(--panel-2); color: var(--ink);
+      padding: 10px 14px; border-radius: 12px; font-weight: 800;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .btn.primary { background: var(--accent); color: #102019; border-color: transparent; }
+    .btn.gold { background: var(--accent-2); color: #241a08; border-color: transparent; }
+    .btn.danger { background: #8d3634; color: white; border-color: #b95d59; }
+    .btn.ghost { background: transparent; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .role-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; }
+    .role-tile { min-height: 185px; display: flex; flex-direction: column; justify-content: space-between; }
+    .role-symbol { font-size: 2rem; }
+    .role-title { font-weight: 900; font-size: 1.06rem; }
+    .role-job { color: var(--muted); font-size: .87rem; }
+    .round-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+    .clue-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+    .clue {
+      min-height: 210px; border-radius: 16px; border: 1px dashed #476256; background: rgba(12,22,18,.48);
+      display: flex; flex-direction: column; justify-content: center; padding: 16px; position: relative; overflow: hidden;
+    }
+    .clue.locked::after {
+      content: "클릭해 단서 공개"; position: absolute; inset: 0; display: grid; place-items: center;
+      background: linear-gradient(135deg, #182a23, #102019); color: var(--accent); font-weight: 900; letter-spacing: .03em;
+    }
+    .clue h3 { margin: 0 0 8px; color: var(--accent-2); }
+    .clue p { margin: 0; }
+    .timer-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    #timerDisplay { font-variant-numeric: tabular-nums; font-size: 2rem; font-weight: 950; color: var(--accent-2); min-width: 120px; }
+    .vote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label { display: grid; gap: 6px; font-weight: 800; }
+    select, input, textarea {
+      width: 100%; border: 1px solid var(--line); background: #0f1916; color: var(--ink); border-radius: 10px; padding: 10px 11px;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .score { display: none; margin-top: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #0f1916; }
+    .modal {
+      display: none; position: fixed; inset: 0; z-index: 50; background: rgba(3,7,6,.9); padding: 18px;
+      overflow-y: auto;
+    }
+    .modal.open { display: block; }
+    .modal-panel { width: min(820px, 100%); margin: 20px auto; background: #14201c; border: 1px solid #436050; border-radius: 20px; box-shadow: 0 25px 80px rgba(0,0,0,.5); }
+    .modal-top { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 16px; background: rgba(20,32,28,.97); border-bottom: 1px solid var(--line); border-radius: 20px 20px 0 0; }
+    .modal-body { padding: 22px; }
+    .secret-box { padding: 14px; border-radius: 12px; background: rgba(255,147,138,.08); border: 1px solid rgba(255,147,138,.3); }
+    .truth-box { padding: 14px; border-radius: 12px; background: rgba(155,227,177,.07); border: 1px solid rgba(155,227,177,.28); }
+    .objective { padding: 12px; border-radius: 12px; background: rgba(158,201,255,.08); border: 1px solid rgba(158,201,255,.28); }
+    .confirm-screen { text-align: center; padding: 48px 22px; }
+    .confirm-screen .big { font-size: 3rem; }
+    .hidden { display: none !important; }
+    .tag { display: inline-flex; margin: 2px 4px 2px 0; padding: 3px 8px; font-size: .78rem; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+    .solution-cover { border: 1px solid var(--danger); background: rgba(141,54,52,.12); }
+    details { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: rgba(15,25,22,.55); }
+    details + details { margin-top: 10px; }
+    summary { cursor: pointer; font-weight: 900; color: var(--accent); }
+    footer { border-top: 1px solid var(--line); color: var(--muted); padding: 24px 0 40px; font-size: .85rem; }
+    @media (max-width: 930px) {
+      .role-grid, .clue-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .grid.three { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 650px) {
+      .grid.two, .grid.three, .vote-grid, .role-grid, .clue-grid { grid-template-columns: 1fr; }
+      header { padding-top: 36px; }
+      .card { padding: 16px; }
+      .time-row { grid-template-columns: 62px 1fr; }
+    }
+    @media print {
+      nav, .timer-box, .no-print { display: none !important; }
+      body { background: white; color: black; }
+      section { display: block !important; }
+      .card { box-shadow: none; border-color: #aaa; background: white; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">5인 · GM 없이 진행 · 30~60분</div>
+    <h1>정오의 온실<br><span class="accent">사라진 12분</span></h1>
+    <p class="subtitle">스마트팜 기업의 비공개 시연을 앞둔 정오. 대표의 목소리가 담긴 방송으로부터 7분 뒤, 그는 시험 온실에서 숨진 채 발견됐다.</p>
+    <div class="badge-row">
+      <span class="badge">난이도 중상</span><span class="badge">현대극</span><span class="badge">밀담 없음</span><span class="badge">역할지·단서 스포일러 차단</span><span class="badge">권장 40~50분</span>
+    </div>
+  </div>
+</header>
+<nav>
+  <div class="wrap nav-inner">
+    <button class="nav-btn active" data-tab="intro">사건 안내</button>
+    <button class="nav-btn" data-tab="rules">진행·룰</button>
+    <button class="nav-btn" data-tab="roles">역할지</button>
+    <button class="nav-btn" data-tab="round1">1라운드</button>
+    <button class="nav-btn" data-tab="round2">2라운드</button>
+    <button class="nav-btn" data-tab="vote">최종 지목</button>
+    <button class="nav-btn" data-tab="solution">정답·해설</button>
+  </div>
+</nav>
+<main class="wrap">
+  <section id="intro" class="active">
+    <div class="grid two">
+      <article class="card">
+        <h2>사건 개요</h2>
+        <p><strong>2028년 6월 18일, 12시 24분.</strong> 스마트팜 기업 <strong>버던트 파이브</strong>의 B동 시험 온실에서 대표 <strong>권태성</strong>이 숨진 채 발견됐다.</p>
+        <p>12시 17분, 온실 스피커에서는 분명 권 대표의 목소리가 흘러나왔다.</p>
+        <div class="notice">“회의를 12시 40분으로 미룬다. 아무도 B동에 들어오지 마.”</div>
+        <p>그러나 외부인은 없었다. 건물 안에 남아 있던 사람은 오늘 비공개 시연을 준비하던 다섯 명뿐이다.</p>
+      </article>
+      <article class="card">
+        <h2>공개 전제</h2>
+        <ul class="clean">
+          <li>피해자는 B동 시험 온실 내부에서 발견됐다.</li>
+          <li>외부 출입 기록은 오전 11시 40분 이후 없다.</li>
+          <li>모든 플레이어는 피해자와 갈등 또는 숨길 일이 있다.</li>
+          <li>범인은 다섯 역할 중 한 명이다.</li>
+          <li>초자연적 현상, 쌍둥이, 숨겨진 제3자는 없다.</li>
+        </ul>
+      </article>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>오늘 밝혀야 할 것</h2>
+      <div class="grid three">
+        <div><h3 class="accent">① 범인</h3><p class="soft">누가 권태성을 죽였는가?</p></div>
+        <div><h3 class="gold">② 범행</h3><p class="soft">어떤 수단과 경위로 사건이 벌어졌는가?</p></div>
+        <div><h3 class="blue">③ 전말</h3><p class="soft">사건 전후에 실제로 무슨 일이 있었는가?</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="grid two">
+      <article class="card">
+        <h2>권장 진행표</h2>
+        <div class="timeline">
+          <div class="time-row"><span class="time">0~5분</span><span>공개 사건 안내와 룰 확인</span></div>
+          <div class="time-row"><span class="time">5~10분</span><span>각자 역할지 비공개 열람</span></div>
+          <div class="time-row"><span class="time">10~23분</span><span>1라운드: 자기소개·초기 심문·단서 5장</span></div>
+          <div class="time-row"><span class="time">23~38분</span><span>2라운드: 반박·타임라인 정리·단서 5장</span></div>
+          <div class="time-row"><span class="time">38~45분</span><span>최종 변론·개별 지목</span></div>
+          <div class="time-row"><span class="time">45~50분</span><span>정답 공개와 결말</span></div>
+        </div>
+        <p class="soft">30분 진행 시 각 라운드를 8분으로, 60분 진행 시 각 라운드를 18분으로 늘리세요.</p>
+      </article>
+      <article class="card">
+        <h2>타이머</h2>
+        <div class="timer-box">
+          <div id="timerDisplay">15:00</div>
+          <button class="btn" onclick="setTimer(8)">8분</button>
+          <button class="btn" onclick="setTimer(13)">13분</button>
+          <button class="btn" onclick="setTimer(15)">15분</button>
+          <button class="btn primary" onclick="toggleTimer()" id="timerToggle">시작</button>
+          <button class="btn ghost" onclick="resetTimer()">초기화</button>
+        </div>
+        <h3 style="margin-top:22px">빠른 진행 팁</h3>
+        <ul class="clean soft">
+          <li>1라운드 시작과 동시에 단서팩을 모두 공개합니다.</li>
+          <li>각 플레이어의 <strong>의무 공개</strong> 문장은 해당 라운드 안에 반드시 말합니다.</li>
+          <li>토론이 막히면 각 인물의 <strong>동선·접근 권한·물증</strong>을 나누어 표처럼 정리합니다.</li>
+        </ul>
+      </article>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>기본 룰</h2>
+      <div class="grid two">
+        <div>
+          <h3 class="accent">모든 플레이어</h3>
+          <ul class="clean">
+            <li>자신의 역할지와 공개된 카드에 있는 사실만 사용합니다.</li>
+            <li>개인 비밀은 숨기거나 답변을 피할 수 있습니다.</li>
+            <li>새로운 증거·인물·목격 사실을 만들어내면 안 됩니다.</li>
+            <li>역할지의 ‘의무 공개’는 정해진 라운드 안에 공개해야 합니다.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="danger">범인 역할</h3>
+          <ul class="clean">
+            <li>자신의 범행·동선·의도에 관해서는 거짓말할 수 있습니다.</li>
+            <li>공개 증거 자체를 부정하거나 가짜 증거를 만들 수 없습니다.</li>
+            <li>최종 투표에서 3표 이상 받지 않으면 범인 승리입니다.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="roles">
+    <div class="card">
+      <h2>역할 선택</h2>
+      <p class="warning"><strong>한 사람씩 자신의 역할만 여세요.</strong> 확인 후 반드시 ‘역할지 가리기’를 눌러 다음 사람에게 기기를 넘기세요.</p>
+      <div class="role-grid" style="margin-top:16px">
+        <article class="card role-tile"><div><div class="role-symbol">🌱</div><div class="role-title">서지원</div><div class="role-job">식물생리 연구책임자</div><p class="soft">직선적 · 관찰력 · 이상주의</p></div><button class="btn primary" onclick="openRole('jiwon')">내 역할지 보기</button></article>
+        <article class="card role-tile"><div><div class="role-symbol">🕯️</div><div class="role-title">한서린</div><div class="role-job">품질·생물안전 책임자</div><p class="soft">신중함 · 원칙주의 · 예민한 직감</p></div><button class="btn primary" onclick="openRole('seorin')">내 역할지 보기</button></article>
+        <article class="card role-tile"><div><div class="role-symbol">🔥</div><div class="role-title">박해준</div><div class="role-job">AI 제품개발 책임자</div><p class="soft">추진력 · 자신감 · 승부욕</p></div><button class="btn primary" onclick="openRole('haejun')">내 역할지 보기</button></article>
+        <article class="card role-tile"><div><div class="role-symbol">📒</div><div class="role-title">윤명주</div><div class="role-job">재무·구매 책임자</div><p class="soft">현실감각 · 인내 · 계산된 행동</p></div><button class="btn primary" onclick="openRole('myeongju')">내 역할지 보기</button></article>
+        <article class="card role-tile"><div><div class="role-symbol">🧰</div><div class="role-title">최나리</div><div class="role-job">농장 운영책임자</div><p class="soft">끈기 · 기민함 · 강한 책임감</p></div><button class="btn primary" onclick="openRole('nari')">내 역할지 보기</button></article>
+      </div>
+    </div>
+    <details style="margin-top:16px">
+      <summary>진행자용 사주-역할 매칭표 보기</summary>
+      <p class="soft">사주는 성격을 단정하는 도구가 아니라 캐릭터 설계의 모티프로만 사용했습니다.</p>
+      <ul class="clean">
+        <li>1995.11.29 · 갑자일주 → 서지원</li>
+        <li>1994.12.07 · 정묘일주 → 한서린</li>
+        <li>1997.05.14 · 병진일주 → 박해준</li>
+        <li>1992.04.19 · 을축일주 → 윤명주</li>
+        <li>1994.02.08 · 을축일주 → 최나리</li>
+      </ul>
+    </details>
+  </section>
+
+  <section id="round1">
+    <div class="card">
+      <div class="round-head"><div><h2>1라운드 · 남겨진 기록</h2><p class="soft">권장 10~13분. 모든 카드를 공개한 뒤 자기소개와 초기 심문을 진행하세요.</p></div><button class="btn gold" onclick="revealAll('r1')">5장 모두 공개</button></div>
+      <div class="clue-grid">
+        <article class="clue locked r1" onclick="revealClue(this)"><h3>단서 1 · 현장 감식</h3><p>권태성의 왼쪽 후두부에 단 한 차례 강한 타격 흔적이 있다. 현장에 끌린 자국은 없으며, 사망 장소는 B동 온실 내부로 보인다.</p></article>
+        <article class="clue locked r1" onclick="revealClue(this)"><h3>단서 2 · 건강 밴드</h3><p>피해자의 건강 밴드는 <strong>12:08:14</strong>까지 맥박을 기록했다. 이후 센서 분리 흔적 없이 수치가 0으로 고정됐다.</p></article>
+        <article class="clue locked r1" onclick="revealClue(this)"><h3>단서 3 · 스피커 기록</h3><p>12:17 방송은 실시간 마이크가 아니라 온실 태블릿에 저장된 <strong>로컬 음성 파일</strong>을 재생한 기록이다.</p></article>
+        <article class="clue locked r1" onclick="revealClue(this)"><h3>단서 4 · 출입 기록</h3><p>정문 생체인증: 권태성 11:50 입장. 윤명주 11:56 입장·11:59 퇴장. 한서린 12:04 입장·12:09 퇴장. 12:02~12:12 제어 게이트웨이 장애로 서비스문 기록은 남지 않았다.</p></article>
+        <article class="clue locked r1" onclick="revealClue(this)"><h3>단서 5 · 사라진 도구</h3><p>공용 계측 캐비닛의 <strong>2kg 황동 교정추</strong> 한 개가 사라졌다. 캐비닛은 연구·안전·운영팀이 공동 사용한다.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="round2">
+    <div class="card">
+      <div class="round-head"><div><h2>2라운드 · 엇갈린 증거</h2><p class="soft">권장 12~15분. 역할지의 2라운드 의무 공개를 말하고 사건의 전체 흐름을 정리하세요.</p></div><button class="btn gold" onclick="revealAll('r2')">5장 모두 공개</button></div>
+      <div class="clue-grid">
+        <article class="clue locked r2" onclick="revealClue(this)"><h3>단서 6 · 음성 분석</h3><p>방송 음성에는 두 개의 서로 다른 환풍기 소리가 이어진다. “회의를 12시 40분으로” 부분은 과거 안전교육 영상 두 편을 이어 붙인 합성 음성이다.</p></article>
+        <article class="clue locked r2" onclick="revealClue(this)"><h3>단서 7 · 태블릿 캐시</h3><p>온실 태블릿은 11:43에 제한 폴더 <strong>QA/Q-17/교육원본</strong>의 음원 두 개를 불러왔다. 해당 폴더는 대표와 품질·생물안전 책임자만 열 수 있다.</p></article>
+        <article class="clue locked r2" onclick="revealClue(this)"><h3>단서 8 · 흉기 회수</h3><p>교정추는 UV 멸균 캐비닛 안에서 발견됐다. 손잡이에는 지워지지 않은 <strong>Q-17 형광 검사겔</strong>이 남아 있다. 이 겔은 오전 품질 점검에서 사용됐다.</p></article>
+        <article class="clue locked r2" onclick="revealClue(this)"><h3>단서 9 · 멸균기 로그</h3><p>UV 멸균 캐비닛은 <strong>12:09:03</strong>에 작동했다. 작동 권한은 대표 카드와 품질·생물안전 책임자 카드뿐이다. 대표의 카드는 시신 주머니에 있었다.</p></article>
+        <article class="clue locked r2" onclick="revealClue(this)"><h3>단서 10 · 삭제 전 메일</h3><p>권태성이 11:58 작성한 임시 메일: “13시 Q-17 사고 보고를 공개한다. 원본 정비 요청서는 폐기하고 <strong>한서린 단독 책임</strong>으로 정리할 것.”</p></article>
+      </div>
+      <div class="card" style="margin-top:16px; box-shadow:none">
+        <h3>선택형 진행 보조</h3>
+        <p class="soft">정답을 향한 방향을 제공하므로 토론이 실제로 멈췄을 때만 순서대로 여세요.</p>
+        <details>
+          <summary>힌트 1 · 단서 분류</summary>
+          <p>열 장의 단서를 <strong>시간 기록·장소와 동선·접근 권한·물증·동기</strong>로 나누어 정리하세요. 같은 사람을 가리키는 범주가 몇 개인지 비교해 보세요.</p>
+        </details>
+        <details>
+          <summary>힌트 2 · 기록 비교</summary>
+          <p>사람의 진술보다 기계가 남긴 기록을 먼저 시간순으로 놓으세요. 서로 양립하기 어려워 보이는 두 기록이 있다면, 둘 중 하나가 무엇을 증명하는지 다시 따져보세요.</p>
+        </details>
+        <details>
+          <summary>힌트 3 · 강한 힌트</summary>
+          <p>피해자의 생존 여부를 보여주는 기록과 12시 17분 방송의 재생 방식을 함께 비교하세요. 그다음 현장에 있었던 사람, 파일과 멸균기에 접근할 수 있었던 사람의 교집합을 찾으세요.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="vote">
+    <div class="card">
+      <h2>최종 변론과 지목</h2>
+      <ol class="clean">
+        <li>각자 30초씩 “범인·사망 시각·핵심 근거”를 말합니다.</li>
+        <li>동시에 손가락으로 지목하거나 아래 기록란을 사용합니다.</li>
+        <li>범인에게 3표 이상 모이면 수사팀 승리, 2표 이하이면 범인 승리입니다.</li>
+      </ol>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="vote-grid">
+        <label>범인
+          <select id="voteCulprit"><option value="">선택</option><option>서지원</option><option>한서린</option><option>박해준</option><option>윤명주</option><option>최나리</option></select>
+        </label>
+        <label>실제 사망 시각
+          <select id="voteTime"><option value="">선택</option><option>11:58 전후</option><option>12:08 전후</option><option>12:17 전후</option><option>12:24 전후</option></select>
+        </label>
+        <label>흉기<input id="voteWeapon" placeholder="예: 교정추" /></label>
+        <label>사건의 핵심 경위<input id="voteTrick" placeholder="증거와 증언이 어떻게 연결되는지 적으세요" /></label>
+      </div>
+      <label style="margin-top:14px">핵심 근거<textarea id="voteReason" placeholder="가장 결정적이라고 생각한 단서 2~3개"></textarea></label>
+      <div class="button-row" style="margin-top:14px"><button class="btn primary" onclick="saveVote()">추리 기록 저장</button><span id="voteSaved" class="soft"></span></div>
+    </div>
+  </section>
+
+  <section id="solution">
+    <div id="solutionCover" class="card solution-cover confirm-screen">
+      <div class="big">⚠️</div>
+      <h2>모든 플레이어의 투표가 끝났나요?</h2>
+      <p class="soft">아래 버튼을 누르면 범인, 범행 수법, 전체 타임라인이 공개됩니다.</p>
+      <button class="btn danger" onclick="revealSolution()">정답과 결말 공개</button>
+    </div>
+    <div id="solutionBody" class="hidden">
+      <div class="card">
+        <div class="eyebrow danger">SOLUTION</div>
+        <h2>범인은 <span class="danger">한서린</span></h2>
+        <p>실제 사망 시각은 <strong>12시 08분 전후</strong>, 흉기는 공용 계측 캐비닛의 <strong>2kg 황동 교정추</strong>다. 12시 17분의 목소리는 사전에 편집해 예약 재생한 합성 음성이었다.</p>
+      </div>
+      <div class="grid two" style="margin-top:16px">
+        <article class="card">
+          <h2>범행 동기</h2>
+          <p>Q-17은 권태성이 정비 요청을 묵살해 발생한 농약 노출 사고였다. 그는 투자 유치를 지키기 위해 원본 요청서를 없애고 한서린에게 모든 책임을 씌우려 했다.</p>
+          <p>한서린은 오전에 삭제 예정 메일을 확인했고, 자신이 해고되는 것에 그치지 않고 형사 책임까지 떠안을 수 있다는 사실을 알았다. 그는 대화를 위한 것이 아니라 <strong>알리바이를 만든 뒤 권태성을 살해하기로</strong> 결심했다.</p>
+        </article>
+        <article class="card">
+          <h2>범행 수법</h2>
+          <ol class="clean">
+            <li>11:43, QA 제한 폴더의 과거 안전교육 영상에서 권태성의 말을 잘라 음성을 합성했다.</li>
+            <li>12:04, 점검을 명분으로 B동에 들어가 12:08 교정추로 권태성의 후두부를 가격했다.</li>
+            <li>교정추를 UV 멸균 캐비닛에 넣고 자신의 권한 카드로 12:09 멸균을 시작했다.</li>
+            <li>12:17에 합성 음성이 자동 재생되도록 예약해 사망 시각을 늦춰 보이게 했다.</li>
+          </ol>
+        </article>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>결정적 추리 연결</h2>
+        <div class="timeline">
+          <div class="time-row"><span class="time">12:08</span><span>건강 밴드가 사망 시점을 고정한다. 따라서 12:17의 목소리는 생존 증거가 아니다.</span></div>
+          <div class="time-row"><span class="time">11:43</span><span>합성 음원의 원본은 QA 제한 폴더에서 불러왔다. 접근자는 대표 또는 한서린뿐이다.</span></div>
+          <div class="time-row"><span class="time">12:04~09</span><span>한서린은 사망 시각에 온실 안에 있었고, 12:09 흉기 멸균 권한도 갖고 있었다.</span></div>
+          <div class="time-row"><span class="time">동기</span><span>삭제 전 메일은 권태성이 Q-17 책임을 한서린에게 전가하려 했음을 보여준다.</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>전체 진실 타임라인</h2>
+        <div class="timeline">
+          <div class="time-row"><span class="time">11:43</span><span>한서린이 음성 파일을 제작하고 12:17 예약 재생을 설정한다.</span></div>
+          <div class="time-row"><span class="time">11:56</span><span>윤명주가 권태성과 회계자료 문제로 다투고 회사 인감을 가져간다.</span></div>
+          <div class="time-row"><span class="time">12:02</span><span>박해준이 모델 조작 기록을 숨기기 위해 제어 게이트웨이를 끈다. 이 때문에 서비스문 로그도 비게 된다.</span></div>
+          <div class="time-row"><span class="time">12:04</span><span>한서린이 B동에 들어간다. 서지원은 인접 준비실에서 금속 충격음을 듣는다.</span></div>
+          <div class="time-row"><span class="time">12:08</span><span>권태성이 교정추에 맞아 사망한다.</span></div>
+          <div class="time-row"><span class="time">12:09</span><span>한서린이 흉기를 UV 멸균기에 넣고 퇴장한다.</span></div>
+          <div class="time-row"><span class="time">12:11</span><span>최나리가 서비스문으로 들어와 이미 작동 중인 멸균기를 본다.</span></div>
+          <div class="time-row"><span class="time">12:17</span><span>예약된 합성 음성이 재생된다.</span></div>
+          <div class="time-row"><span class="time">12:24</span><span>환경 경보로 온실이 개방되고 시신이 발견된다.</span></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>결말 낭독</h2>
+        <p>한서린은 마지막까지 침착하게 출입 기록의 빈틈을 지적했다. 하지만 맥박이 멈춘 시각, QA 폴더에서 잘라낸 목소리, 12시 09분에 켜진 멸균기가 한 줄로 이어지자 더는 설명할 수 없었다.</p>
+        <p>그는 Q-17 원본 보고서를 테이블 위에 내려놓았다.</p>
+        <div class="notice">“그 사람이 만든 거짓말 속에서 내가 범인이 되느니, 내가 만든 거짓말로 그 사람을 끝내려고 했어요.”</div>
+        <p>온실의 환풍기가 다시 돌기 시작했다. 12시 17분의 목소리는 두 번 다시 재생되지 않았다.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 역할지 모달 -->
+<div id="roleModal" class="modal" aria-hidden="true">
+  <div class="modal-panel">
+    <div class="modal-top"><strong id="roleModalTitle">역할지</strong><button class="btn danger" onclick="closeRole()">역할지 가리기</button></div>
+    <div id="roleConfirm" class="confirm-screen">
+      <div class="big">🔒</div><h2 id="confirmRoleName">이 역할 플레이어만 확인하세요</h2>
+      <p class="soft">옆 사람이 화면을 보지 않는지 확인한 뒤 여세요.</p>
+      <button class="btn primary" onclick="confirmRoleOpen()">비밀 역할지 열기</button>
+    </div>
+    <div id="roleContent" class="modal-body hidden"></div>
+  </div>
+</div>
+
+<template id="role-jiwon">
+  <div class="eyebrow">ROLE 1</div><h2>서지원 · 식물생리 연구책임자</h2>
+  <p><span class="tag">갑목의 직선성</span><span class="tag">수 기운의 관찰력</span><span class="tag">상관의 문제 제기</span></p>
+  <div class="truth-box"><strong>당신은 범인이 아니다.</strong> 데이터가 틀렸다면 직급과 관계없이 말해야 한다고 믿는다. 권태성은 당신이 발견한 잔류농약 수치를 “시연 후 다시 보자”며 삭제하려 했다.</div>
+  <h3>숨기고 싶은 비밀</h3><p>11:46, 원본 생육 데이터를 개인 USB에 복사했다. 내부고발을 준비했지만 회사 기밀 반출로 처벌받을 수 있다.</p>
+  <h3>당신의 동선</h3>
+  <ul class="clean"><li>11:52~12:00 연구실에서 시료 정리.</li><li>12:01~12:10 B동 옆 준비실에 있었다.</li><li>12:07 무렵, 온실 쪽에서 짧고 둔한 금속 충격음을 들었다.</li><li>12:10 연구실로 돌아갔다.</li></ul>
+  <h3>당신만 아는 사실</h3><p>12:01 준비실로 갈 때 한서린이 회색 문서 파우치와 공용 계측 캐비닛 열쇠를 들고 B동 쪽으로 가는 모습을 봤다.</p>
+  <div class="objective"><strong>개인 목표</strong><br>① 범인을 맞힌다. ② 데이터 USB를 끝까지 숨기거나, 공개하더라도 정당성을 설득한다.</div>
+  <h3 class="gold">1라운드 의무 공개</h3><p>“나는 12:01부터 준비실에 있었고, 12:07쯤 금속이 부딪히는 소리를 들었다.”</p>
+  <h3 class="gold">2라운드 의무 공개</h3><p>“B동으로 가던 한서린이 공용 계측 캐비닛 열쇠를 들고 있었다.”</p>
+  <h3>연기 방향</h3><p>질문을 피하기보다 상대의 논리적 빈틈을 집요하게 짚는다. 단, USB 이야기가 나오면 평소보다 빠르게 말을 끊는다.</p>
+</template>
+
+<template id="role-seorin">
+  <div class="eyebrow danger">ROLE 2 · CULPRIT</div><h2>한서린 · 품질·생물안전 책임자</h2>
+  <p><span class="tag">정화의 집중력</span><span class="tag">편인의 예민함</span><span class="tag">정관의 원칙 의식</span></p>
+  <div class="secret-box"><strong>당신이 범인이다.</strong><br>권태성은 자신이 묵살한 Q-17 정비 요청을 없애고, 오후 1시에 당신을 사고의 단독 책임자로 발표하려 했다. 당신은 오전 11:43 안전교육 영상 두 편에서 그의 음성을 잘라 12:17 방송을 만들었다. 12:04 B동에 들어가 말다툼 끝에 12:08 교정추로 후두부를 가격했다. 교정추를 UV 멸균기에 넣고 12:09 작동시킨 뒤 나왔다.</div>
+  <h3>당신의 위장 진술</h3><p>“12:04~12:09 정기 품질 점검을 했다. 권 대표는 서류를 보고 있었고, 내가 나올 때까지 살아 있었다.”</p>
+  <h3>이용할 수 있는 의심거리</h3>
+  <ul class="clean"><li>윤명주는 피해자와 실제로 크게 다퉜고 회사 인감을 훔쳤다.</li><li>박해준이 게이트웨이를 꺼 서비스문 기록을 없앴다.</li><li>최나리는 마스터키로 기록 없이 B동에 들어갈 수 있다.</li><li>서지원은 현장 인접 준비실에 있었고 데이터 절도 동기가 있다.</li></ul>
+  <h3>주의</h3><p>당신은 자신의 행동에 대해 거짓말할 수 있지만, 공개 카드의 수치·로그를 가짜라고 주장하거나 새로운 증거를 만들 수 없다.</p>
+  <div class="objective"><strong>개인 목표</strong><br>최종 투표에서 3표 이상 받지 않는다. 음성 파일은 ‘누군가 QA 태블릿을 훔쳐 썼다’, 멸균기는 ‘대표가 직접 켰거나 카드가 복제됐다’고 의심을 분산시킬 수 있다.</div>
+  <h3 class="gold">1라운드 의무 공개</h3><p>“12:04부터 12:09까지 B동에서 품질 점검을 했고, 나올 때 권 대표는 살아 있었다.”</p>
+  <h3 class="gold">2라운드 의무 공개</h3><p>“권 대표가 Q-17 책임을 내게 돌리겠다고 협박한 것은 사실이다. 하지만 그래서 죽였다는 뜻은 아니다.”</p>
+  <h3>연기 방향</h3><p>목소리를 높이지 않는다. 모든 증거에 대안 가설을 하나씩 제시하고, ‘접근 권한’과 ‘실제 사용’을 구분하라고 요구한다.</p>
+</template>
+
+<template id="role-haejun">
+  <div class="eyebrow">ROLE 3</div><h2>박해준 · AI 제품개발 책임자</h2>
+  <p><span class="tag">병화의 추진력</span><span class="tag">비견의 자신감</span><span class="tag">식신의 구현 능력</span></p>
+  <div class="truth-box"><strong>당신은 범인이 아니다.</strong> 이번 시연의 병해 예측 모델은 실제보다 좋아 보이도록 평가 데이터를 일부 학습에 섞었다. 권태성은 이를 알고도 투자 유치에 이용한 뒤 모든 책임을 당신에게 넘기려 했다.</div>
+  <h3>숨기고 싶은 비밀</h3><p>12:02, 모델 실험 로그를 지우려고 제어 게이트웨이 전원을 뽑았다. 12:12 복구할 때까지 출입·센서 기록 일부가 비었다.</p>
+  <h3>당신의 동선</h3><ul class="clean"><li>11:58~12:12 제어실에 있었다.</li><li>제어실 콘솔 조작과 통화 기록이 있어 물리적으로 B동까지 다녀오기 어렵다.</li><li>12:12 게이트웨이를 복구한 뒤 환경 경보 이상을 확인했다.</li></ul>
+  <h3>당신만 아는 사실</h3><p>삭제되지 않은 네트워크 캐시에 11:43 온실 태블릿이 QA 제한 폴더 음원을 내려받은 흔적이 남았다. 태블릿 자체의 최근 기록은 누군가 닦아냈다.</p>
+  <div class="objective"><strong>개인 목표</strong><br>① 범인을 맞힌다. ② 모델 성능 조작이 살인과 무관함을 설득한다.</div>
+  <h3 class="gold">1라운드 의무 공개</h3><p>“12:02부터 12:12까지 게이트웨이가 꺼진 건 내 책임이다. 하지만 나는 그동안 제어실에 있었다.”</p>
+  <h3 class="gold">2라운드 의무 공개</h3><p>“11:43 온실 태블릿이 QA 제한 폴더에서 음원을 내려받았다.”</p>
+  <h3>연기 방향</h3><p>처음에는 자신만만하지만 기술 조작이 드러나면 공격적으로 방어한다. 시스템 로그의 시간값만큼은 정확하게 설명한다.</p>
+</template>
+
+<template id="role-myeongju">
+  <div class="eyebrow">ROLE 4</div><h2>윤명주 · 재무·구매 책임자</h2>
+  <p><span class="tag">을목의 유연함</span><span class="tag">재성의 현실감각</span><span class="tag">정관의 책임감</span></p>
+  <div class="truth-box"><strong>당신은 범인이 아니다.</strong> 권태성이 장비 구매 대금을 부풀려 협력사로 돌린 뒤 일부를 되받은 정황을 발견했다. 그는 당신에게 장부를 고치라고 지시했다.</div>
+  <h3>숨기고 싶은 비밀</h3><p>11:59, 더 이상의 허위 결재를 막으려고 피해자 책상에서 회사 인감을 가져왔다. 시신 발견 후에도 돌려놓지 못했다.</p>
+  <h3>당신의 동선</h3><ul class="clean"><li>11:56 B동에 들어가 권태성과 언쟁.</li><li>11:59 B동에서 나와 곧바로 재무실로 이동.</li><li>12:05~12:10 대형 스캐너로 장부를 복사했다. 스캐너 사용 로그가 남아 있다.</li></ul>
+  <h3>당신만 아는 사실</h3><p>언쟁 중 권태성의 노트북에 열린 임시 메일을 봤다. 내용은 Q-17 사고 책임을 한서린에게 전가하고 원본 정비 요청서를 폐기하라는 것이었다.</p>
+  <div class="objective"><strong>개인 목표</strong><br>① 범인을 맞힌다. ② 회사 인감 절취가 살인이 아니라 추가 횡령을 막기 위한 행동이었음을 설득한다.</div>
+  <h3 class="gold">1라운드 의무 공개</h3><p>“11:56~11:59 권 대표와 장부 문제로 다퉜다. 그리고 회사 인감을 가져왔다.”</p>
+  <h3 class="gold">2라운드 의무 공개</h3><p>“권 대표는 Q-17 사고를 한서린 단독 책임으로 발표하려 했다.”</p>
+  <h3>연기 방향</h3><p>감정보다 숫자와 기록을 신뢰한다. 인감 이야기를 할 때만 시선을 피하고, 나머지는 차분히 시간 순서로 말한다.</p>
+</template>
+
+<template id="role-nari">
+  <div class="eyebrow">ROLE 5</div><h2>최나리 · 농장 운영책임자</h2>
+  <p><span class="tag">을목의 끈기</span><span class="tag">겁재의 경쟁심</span><span class="tag">상관의 직언</span></p>
+  <div class="truth-box"><strong>당신은 범인이 아니다.</strong> 권태성은 인력 부족을 숨기기 위해 야간 작업 시간을 삭제했고, 사고가 나면 현장 직원 책임으로 돌렸다. 당신은 직원 대표들과 집단 신고를 준비했다.</div>
+  <h3>숨기고 싶은 비밀</h3><p>노동청 제출용 연명서를 B동 위생 전실 천장에 숨겨 두었다. 12:11 마스터키로 서비스문을 열고 그것을 가지러 갔다.</p>
+  <h3>당신의 동선</h3><ul class="clean"><li>12:00~12:06 하역장에서 납품 기사와 통화.</li><li>12:07~12:10 공구실에서 고장 난 펌프 부품을 찾았다.</li><li>12:11~12:13 서비스문으로 위생 전실에 들어갔다.</li><li>온실 내부까지는 들어가지 않았고, 이미 UV 멸균기가 돌아가는 소리를 들었다.</li></ul>
+  <h3>당신만 아는 사실</h3><p>UV 멸균기는 점심시간 자동 잠금 상태라 일반 마스터키로는 작동하지 않는다. 대표 카드 또는 품질·생물안전 책임자 카드가 필요하다.</p>
+  <div class="objective"><strong>개인 목표</strong><br>① 범인을 맞힌다. ② 연명서와 마스터키 사용이 직원 보호를 위한 것이었음을 인정받는다.</div>
+  <h3 class="gold">1라운드 의무 공개</h3><p>“나는 12:11 서비스문으로 B동 위생 전실에 들어갔다. 숨겨 둔 연명서를 찾으러 간 거다.”</p>
+  <h3 class="gold">2라운드 의무 공개</h3><p>“그때 UV 멸균기는 이미 작동 중이었다. 일반 마스터키로는 켤 수 없다.”</p>
+  <h3>연기 방향</h3><p>현장 직원을 대신해 화내는 데 익숙하다. 마스터키를 문제 삼으면 정면으로 반박하지만, 연명서의 이름들은 끝까지 보호한다.</p>
+</template>
+
+<footer>
+  <div class="wrap">본 작품은 사주 명식의 오행·일간·십성 이미지를 창작 캐릭터의 성향 모티프로만 활용한 픽션입니다. 실제 인물의 성격이나 행동을 단정하지 않습니다.</div>
+</footer>
+
+<script>
+  const roleNames = {jiwon:'서지원', seorin:'한서린', haejun:'박해준', myeongju:'윤명주', nari:'최나리'};
+  let selectedRole = null;
+  let timerSeconds = 15 * 60;
+  let timerInitial = 15 * 60;
+  let timerHandle = null;
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('main section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      window.scrollTo({top: document.querySelector('nav').offsetTop, behavior: 'smooth'});
+    });
+  });
+
+  function openRole(id) {
+    selectedRole = id;
+    document.getElementById('roleModal').classList.add('open');
+    document.getElementById('roleModal').setAttribute('aria-hidden','false');
+    document.getElementById('roleConfirm').classList.remove('hidden');
+    document.getElementById('roleContent').classList.add('hidden');
+    document.getElementById('confirmRoleName').textContent = roleNames[id] + ' 플레이어만 확인하세요';
+    document.getElementById('roleModalTitle').textContent = roleNames[id] + ' 역할지';
+    document.body.style.overflow = 'hidden';
+  }
+  function confirmRoleOpen() {
+    const template = document.getElementById('role-' + selectedRole);
+    document.getElementById('roleContent').innerHTML = template.innerHTML;
+    document.getElementById('roleConfirm').classList.add('hidden');
+    document.getElementById('roleContent').classList.remove('hidden');
+  }
+  function closeRole() {
+    document.getElementById('roleModal').classList.remove('open');
+    document.getElementById('roleModal').setAttribute('aria-hidden','true');
+    document.getElementById('roleContent').innerHTML = '';
+    document.body.style.overflow = '';
+    selectedRole = null;
+  }
+  document.getElementById('roleModal').addEventListener('click', e => { if (e.target.id === 'roleModal') closeRole(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRole(); });
+
+  function revealClue(el) { el.classList.remove('locked'); }
+  function revealAll(roundClass) { document.querySelectorAll('.' + roundClass).forEach(el => el.classList.remove('locked')); }
+
+  function updateTimer() {
+    const m = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
+    const s = String(timerSeconds % 60).padStart(2,'0');
+    document.getElementById('timerDisplay').textContent = m + ':' + s;
+    if (timerSeconds <= 0) {
+      clearInterval(timerHandle); timerHandle = null;
+      document.getElementById('timerToggle').textContent = '시작';
+      document.getElementById('timerDisplay').textContent = '시간 종료';
+    }
+  }
+  function setTimer(minutes) {
+    clearInterval(timerHandle); timerHandle = null;
+    timerInitial = timerSeconds = minutes * 60;
+    document.getElementById('timerToggle').textContent = '시작'; updateTimer();
+  }
+  function toggleTimer() {
+    if (timerHandle) {
+      clearInterval(timerHandle); timerHandle = null;
+      document.getElementById('timerToggle').textContent = '계속';
+    } else {
+      timerHandle = setInterval(() => { timerSeconds--; updateTimer(); }, 1000);
+      document.getElementById('timerToggle').textContent = '일시정지';
+    }
+  }
+  function resetTimer() {
+    clearInterval(timerHandle); timerHandle = null; timerSeconds = timerInitial;
+    document.getElementById('timerToggle').textContent = '시작'; updateTimer();
+  }
+  function saveVote() {
+    const data = {
+      culprit: document.getElementById('voteCulprit').value,
+      time: document.getElementById('voteTime').value,
+      weapon: document.getElementById('voteWeapon').value,
+      trick: document.getElementById('voteTrick').value,
+      reason: document.getElementById('voteReason').value
+    };
+    sessionStorage.setItem('greenhouseVote', JSON.stringify(data));
+    document.getElementById('voteSaved').textContent = '이 기기에 추리 기록을 저장했습니다.';
+  }
+  function revealSolution() {
+    if (!confirm('정말 정답을 공개할까요? 모든 투표가 끝났는지 확인하세요.')) return;
+    document.getElementById('solutionCover').classList.add('hidden');
+    document.getElementById('solutionBody').classList.remove('hidden');
+  }
+  updateTimer();
+</script>
+</body>
+</html>

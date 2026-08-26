@@ -1,0 +1,32 @@
+R39 실제 사용 이미지 목록 (미사용 이미지 0개)
+
+static/assets/intro-splash.png
+- 최초 시작 화면 정지 이미지
+- 1672x941 PNG
+- 이미지 자체에는 시작하기 버튼이 없고 HTML 실제 버튼을 오버레이함
+
+static/assets/input-header-art.jpg
+- 출생정보 화면 상단 정지 이미지
+- 1800x600 JPEG
+
+static/assets/app-background.jpg
+- 입력/서비스 화면 전체 배경
+- 1920x1080 JPEG
+
+static/assets/loading-bunny-hop.webp
+- 로딩 화면 전용 깡총 토끼 애니메이션
+- 340x340 / 6 frames / animated WebP
+
+static/assets/bunny-hero-a1.png
+- 결과 리포트 내부 요약/캐릭터 렌더링용
+- 240x258 PNG
+
+static/assets/report-bunny-badge.png
+- 결과 화면 상단 브랜드 토끼 배지
+- 320x320 PNG
+
+검증 결과
+- static/assets 파일 수: 6
+- 코드가 참조하는 assets 수: 6
+- 미사용 이미지: 0
+- 누락 이미지: 0
