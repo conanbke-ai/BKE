@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-19' in html
+    assert '20260827-rainbow-cloud-20' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -109,6 +109,30 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert "pairName&&value.label?value.label:''" in js
     assert 'mask-image:linear-gradient(90deg,transparent 0%' in css
     assert 'background:linear-gradient(105deg,#ef4f8e 0%,#f36f98 62%,#f69a88 100%)' in css
+    assert 'rgba(255,226,239,.9)' in css
+    assert 'linear-gradient(145deg,#fff7fb 0%,#ffe9f2 100%)' in css
+
+
+def test_cute_icon_language_connects_report_scores_and_relationship_tones():
+    root = Path(__file__).resolve().parents[1]
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+
+    assert 'const RELATION_MOOD=' in js
+    for icon in ('🥕', '💗', '⭐', '☁️', '🌧️'):
+        assert icon in js
+        assert icon in css
+    assert 'function sectionIcon(' in js
+    assert 'class="pillar-cute-icon"' in js
+    assert 'class="relation-mood-icon"' in js
+    assert 'class="metric-label"' in js
+    assert '.matrix-score.excellent small::before{content:"🥕"}' in css
+    assert '.matrix-score.friction small::before{content:"🌧️"}' in css
+    assert '.matrix-legend .friction,.matrix-score.friction{--matrix:#ef9ba6' in css
+    assert '.matrix-legend .excellent,.matrix-score.excellent{--matrix:#48c883' in css
+    assert '.workspace,.page-shell{grid-template-columns:minmax(0,1fr)}' in css
+    assert '.report-header{display:grid;grid-template-columns:minmax(0,1fr) auto' in css
+    assert '.candy-launcher{border-radius:18px;overflow-x:hidden}' in css
 
 
 def test_profile_dashboard_separates_plain_language_from_special_star_evidence():
