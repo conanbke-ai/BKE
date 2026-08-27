@@ -56,9 +56,10 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     root = Path(__file__).resolve().parents[1]
     html = (root / 'templates' / 'index.html').read_text(encoding='utf-8')
     css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-06' in html
+    assert '20260827-rainbow-cloud-07' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -68,8 +69,12 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert '.intro-mobile-copy{display:block' in css
     assert '.compact-submit{width:min(100%,306px)' in css
     assert '.compact-submit::after{content:"→"' in css
-    assert "cursor:url('/static/assets/paw-cursor.svg')" in css
-    assert "cursor:url('/static/assets/carrot-cursor.svg')" in css
+    assert 'id="bunnyCursor" class="bunny-cursor"' in html
+    assert 'class="ui-icon cta-bunny-icon"' in html
+    assert '.bunny-cursor.is-boing .bunny-cursor-paw' in css
+    assert '@keyframes cursorBoing' in css
+    assert 'function initBunnyCursor()' in js
+    assert 'initBunnyCursor();bindBirthPickers()' in js
     assert 'mask-image:linear-gradient(90deg,transparent 0%' in css
     assert 'background:linear-gradient(105deg,#ef4f8e 0%,#f36f98 62%,#f69a88 100%)' in css
 
