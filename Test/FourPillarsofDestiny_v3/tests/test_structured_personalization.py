@@ -60,3 +60,16 @@ def test_day_pillar_relation_exposes_element_flow(monkeypatch):
     assert rel['b_element'] == '火'
     assert rel['stem_kind'] == 'support'
     assert '생(生)' in rel['element_relation_label']
+
+
+def test_main_profile_copy_translates_technical_terms_to_daily_language(monkeypatch):
+    explain = _load_explain(monkeypatch)
+    technical = '원국의 일간과 비겁·식상·재성·관성·인성, 용신을 함께 봅니다.'
+
+    plain = explain._plain_user_text(technical)
+
+    for term in ('원국', '일간', '비겁', '식상', '재성', '관성', '인성', '용신'):
+        assert term not in plain
+    assert '타고난 성향 구성' in plain
+    assert '나의 기본 반응' in plain
+    assert '균형을 위해 보완할 방향' in plain

@@ -165,6 +165,10 @@ def _facts_recommendation_usable(facts: ForcetellerFacts) -> bool:
     )
 
 
+def _facts_ranking_reproducible(facts: ForcetellerFacts) -> bool:
+    return bool(str(facts.chart.day_pillar or '').strip()) and bool(facts.element_percent)
+
+
 def _cache_meta(*, complete_sources: bool, reusable_sources: bool | None = None) -> dict[str, Any]:
     # 'complete' means every optional enrichment field is present.  'reusable' means the
     # saved source is sufficient to reproduce the current report without another browser hit.
@@ -189,12 +193,20 @@ def _result_cache_usable(payload: Any) -> bool:
     if reusable is None:
         # Backward compatibility: old result caches only had complete_sources.
         reusable = meta.get('complete_sources')
-    return (
+    base_usable = (
         meta.get('parser_version') == SETTINGS.parser_version
         and meta.get('scoring_version') == SETTINGS.scoring_version
         and meta.get('report_revision') == SETTINGS.report_revision
         and bool(reusable)
     )
+    if not base_usable:
+        return False
+    # An old initial report can have valid natal facts while its recommendation section is
+    # truncated.  Do not let the outer cache metadata hide that incomplete inner TOP 10.
+    options = payload.get('request_options') or {}
+    if _as_bool(options.get('build_matches'), False):
+        return _auto_payload_complete(payload.get('auto_matches'))
+    return True
 
 def _candidate_key(profile_dict: dict[str, Any]) -> str:
     return (f"{profile_dict['year']:04d}-{profile_dict['month']:02d}-{profile_dict['day']:02d}_" + (f"{profile_dict['hour']:02d}{profile_dict['minute']:02d}" if profile_dict.get('time_known', True) else 'UNKNOWN') + f"_{profile_dict.get('gender','')}")
@@ -391,9 +403,23 @@ def _auto_payload_complete(auto: object) -> bool:
     # survived collection must not become the reusable canonical result.
     if not love_rows or not friend_rows:
         return False
+    meta = auto.get('cache_meta') or {}
+    requested = int((meta.get('cache_identity') or {}).get('top_n') or 0)
+    if requested and (len(love_rows) < requested or len(friend_rows) < requested):
+        return False
     rows = [*love_rows, *friend_rows]
     try:
-        return all(_facts_recommendation_usable(facts_from_dict(row.get('facts') or {})) for row in rows)
+        return all(_facts_ranking_reproducible(facts_from_dict(row.get('facts') or {})) for row in rows)
+    except Exception:
+        return False
+
+
+def _auto_payload_sources_complete(auto: object) -> bool:
+    if not _auto_payload_complete(auto):
+        return False
+    rows = [*(auto.get('love') or []), *(auto.get('friend') or [])]
+    try:
+        return all(_facts_verified(facts_from_dict(row.get('facts') or {})) for row in rows)
     except Exception:
         return False
 
@@ -659,7 +685,7 @@ def initial_analysis(
     source_complete = _facts_verified(user_facts, require_fortune=True)
     source_reusable = _facts_recommendation_usable(user_facts)
     if build_matches:
-        source_complete = source_complete and _auto_payload_complete(auto)
+        source_complete = source_complete and _auto_payload_sources_complete(auto)
         source_reusable = source_reusable and _auto_payload_complete(auto)
     elif auto.get('love') or auto.get('friend'):
         rows = [*auto.get('love', []), *auto.get('friend', [])]

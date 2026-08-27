@@ -8,18 +8,34 @@
 
 기존 프로젝트를 업데이트하는 경우 **기존 `.env`와 `data/` 폴더는 보존**합니다. `data/`에는 이미 확인한 원국 원문과 실행시간 통계가 있으므로 삭제하면 다시 조회해야 할 수 있습니다.
 
+### 전용 가상환경으로 실행
+
+태양광 발전량 예측 프로그램을 비롯한 다른 Python 프로젝트와 패키지가 섞이지 않도록 이 프로젝트는 `.venv-fourpillars-v3`만 사용합니다. Windows에서는 아래 배치 파일을 실행하면 Python 3.10 기반 전용 환경 생성, 패키지 설치, Chromium 준비와 앱 실행까지 자동으로 처리합니다. 현재 셸에 다른 가상환경이 활성화되어 있어도 해당 환경을 사용하지 않습니다.
+
+```bat
+run_windows.bat
+```
+
+직접 명령을 실행할 때도 시스템 `python` 대신 전용 인터프리터를 사용합니다.
+
+자동 테스트까지 실행하려면 개발 의존성을 한 번 설치합니다.
+
+```bat
+.venv-fourpillars-v3\Scripts\python.exe -m pip install -r requirements-dev.txt
+```
+
 ```bash
 # 1) 소스 교체 후 기존 원문을 현재 파서로 재구조화
-python reparse_cache.py
+.venv-fourpillars-v3\Scripts\python.exe reparse_cache.py
 
 # 2) 정적 자산·핵심 로직 계약·문법 검수
-python verify_project.py
+.venv-fourpillars-v3\Scripts\python.exe verify_project.py
 
 # 3) 자동 테스트
-pytest -q
+.venv-fourpillars-v3\Scripts\python.exe -m pytest -q
 
 # 4) 실행
-python app.py
+.venv-fourpillars-v3\Scripts\python.exe app.py
 ```
 
 브라우저:
@@ -163,9 +179,9 @@ tests/                 핵심 계약 자동 테스트
 ## 배포 전 확인
 
 ```bash
-python reparse_cache.py
-python verify_project.py
-pytest -q
+.venv-fourpillars-v3\Scripts\python.exe reparse_cache.py
+.venv-fourpillars-v3\Scripts\python.exe verify_project.py
+.venv-fourpillars-v3\Scripts\python.exe -m pytest -q
 ```
 
 `verify_project.py`는 이미지/CSS/JS 누락, 중복 HTML id, 원국 표시 순서, 그룹 12명 제한 재유입, 직장 그룹의 연애 문구 분기, 신강·신약/대운 파서 계약, 기간 운세 분리, 캐시 완전성, 동적 윤달 입력, 그룹 선택/일주 상성 UI, 폐기된 함수 재유입, Python/JavaScript 문법을 검사합니다.
@@ -188,8 +204,8 @@ Playwright 수집까지 포함한 실제 브라우저 E2E는 외부 사이트 �
 이미 저장된 `result.html`, `result.txt`, `network.json`이 있으면 브라우저를 다시 열기 전에 현재 파서로 재해석합니다. 현재 파서는 저장 HTML에서도 원국, 신강·신약, 용신, 신살·길성 위치, 대운을 복원합니다.
 
 ```bash
-python reparse_cache.py
-python diagnose_forceteller_cache.py
+.venv-fourpillars-v3\Scripts\python.exe reparse_cache.py
+.venv-fourpillars-v3\Scripts\python.exe diagnose_forceteller_cache.py
 ```
 
 진단 결과에서 원문 marker는 존재하는데 parsed 값이 비어 있으면 파서 계약 오류로 취급해야 합니다. 브라우저 수집은 신강·신약/용신/대운 핵심 카드와 신살·길성 영역이 비동기로 렌더링될 시간을 기다린 뒤 전체 `page.content()`를 저장합니다.
@@ -204,10 +220,10 @@ AI 해설 캐시와 결정론적 결과 생성을 분리합니다. `/test`는 �
 기존 프로젝트를 업그레이드한 뒤에는 다음을 한 번 실행하는 것을 권장합니다.
 
 ```bash
-python reparse_cache.py
-python diagnose_forceteller_cache.py
-python verify_project.py
-pytest -q
+.venv-fourpillars-v3\Scripts\python.exe reparse_cache.py
+.venv-fourpillars-v3\Scripts\python.exe diagnose_forceteller_cache.py
+.venv-fourpillars-v3\Scripts\python.exe verify_project.py
+.venv-fourpillars-v3\Scripts\python.exe -m pytest -q
 ```
 
 현재 프로젝트와 형제 폴더의 `FourPillarsofDestiny*/data`를 자동 탐색하며, 별도 위치는

@@ -25,6 +25,8 @@ REQUIRED_FILES = [
     'static/styles.css',
     'static/assets/bunny-hero-a1.png',
     'static/assets/intro-splash.png',
+    'static/assets/input-header-rainbow-v2.png',
+    'static/assets/app-background-clouds-v2.png',
     'static/assets/loading-bunny-hop.webp',
     'static/assets/loading-bunny-hop-fallback.png',
     'audit_contracts.py',
@@ -50,6 +52,8 @@ REQUIRED_JS_FUNCTIONS = [
     'natalInline',
     'showInputScreen',
     'showIntroScreen',
+    'returnFromInput',
+    'startFromIntro',
 ]
 
 
@@ -100,7 +104,7 @@ def main() -> int:
                 fail(errors, f'인트로→입력 화면 전환 UI 계약 누락: {required}')
         if 'approved-bunny-hero' in template:
             fail(errors, '첫 화면에 분리 렌더링하던 구형 hero 토끼 DOM이 다시 포함되어 있습니다.')
-        if 'assets/input-header-art.jpg' not in template or 'input-header-static-image' not in template:
+        if 'assets/input-header-rainbow-v2.png' not in template or 'input-header-static-image' not in template:
             fail(errors, '입력 화면의 정지형 토끼·무지개 헤더 아트가 누락되어 있습니다.')
         if 'assets/loading-bunny-hop.webp' not in template or 'loading-bunny-sprite' not in template:
             fail(errors, '로딩 전용 깡총 토끼 애니메이션 장면이 누락되어 있습니다.')
@@ -126,17 +130,17 @@ def main() -> int:
             fail(errors, '초기 예상시간 계산에 출생연도 정보가 전달되지 않습니다.')
         if 'shortText(' in js:
             fail(errors, '문장을 글자 수로 잘라 표시하는 shortText 로직이 다시 포함되어 있습니다.')
-        if "pillarCard('시주'" not in js or "pillarCard('일주 (나)'" not in js or "pillarCard('월주'" not in js or "pillarCard('연주'" not in js:
+        if "pillarCard('시주 · 장기 관심'" not in js or "pillarCard('일주 · 나의 중심'" not in js or "pillarCard('월주 · 사회와 계절'" not in js or "pillarCard('연주 · 초기 환경'" not in js:
             fail(errors, '내 원국의 시주→일주→월주→연주 카드가 누락되어 있습니다.')
-        if 'const ordered=[byKey.hour,byKey.day,byKey.month,byKey.year]' not in js:
+        if 'ordered=[c.hour_pillar,c.day_pillar,c.month_pillar,c.year_pillar]' not in js:
             fail(errors, '후보/요약 원국의 시주→일주→월주→연주 순서가 누락되어 있습니다.')
-        if not re.search(r"isWork\s*=\s*r\.context\s*===\s*['\"]work['\"]", js) or "'추천 역할 분담'" not in js:
-            fail(errors, '직장 그룹 1:1 해설의 work 전용 분기가 누락되어 있습니다.')
+        if "'추천 역할 분담'" not in js or 'analysis.role_split' not in js:
+            fail(errors, '그룹 1:1 해설의 관계별 역할 분담 표시가 누락되어 있습니다.')
         if 'data-group-jump' not in js or 'groupResultCopy' not in js:
             fail(errors, '그룹 결과 빠른 이동/관계유형별 사용자 문구가 누락되어 있습니다.')
         if 'includeRomance:isLove' not in js:
             fail(errors, '비연인/직장 관계에서 개인 연애 해설을 숨기는 분기가 누락되어 있습니다.')
-        for required in ('profileDomainDetail', 'data-group-node', 'data-group-edge', 'data-matrix-pair', 'groupPersonInspector', 'groupPairInspector'):
+        for required in ('profileDomainDetail', 'data-group-node', 'data-matrix-pair', 'groupPersonInspector', 'groupPairInspector'):
             if required not in js:
                 fail(errors, f'고정 상세 패널/그룹 인터랙티브 탐색 UI 누락: {required}')
         if 'day_pillar' not in js or '일주' not in js:
@@ -147,7 +151,7 @@ def main() -> int:
         for dead_name in ('function insightCards(', 'function groupSynthesis('):
             if dead_name in js:
                 fail(errors, f'사용하지 않는 과거 JS 함수가 다시 포함되어 있습니다: {dead_name}')
-        if "root.addEventListener('keydown'" not in js or "box.addEventListener('keydown'" not in js:
+        if "root.addEventListener('keydown'" not in js or "btn.addEventListener('keydown'" not in js:
             fail(errors, '그룹 매트릭스/관계도 키보드 선택 지원이 누락되어 있습니다.')
         for required in ('day_pillar_relation', 'data-group-selection-status'):
             if required not in js:
@@ -180,7 +184,7 @@ def main() -> int:
     audit_path = ROOT / 'audit_contracts.py'
     if audit_path.is_file():
         audit_proc = subprocess.run(
-            [sys.executable, str(audit_path)],
+            [sys.executable, '-B', str(audit_path)],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -194,8 +198,13 @@ def main() -> int:
             notes.append(f'UI/API/함수/데이터 매핑 감사 통과: {match.group(1)}개 계약' if match else 'UI/API/함수/데이터 매핑 감사 통과')
 
     visible_batch = ROOT / 'run_windows.bat'
-    if visible_batch.is_file() and re.search(r'\bv3\b', visible_batch.read_text(encoding='utf-8'), flags=re.I):
-        fail(errors, 'run_windows.bat 사용자 표시 문구에 v3가 남아 있습니다.')
+    if visible_batch.is_file():
+        batch_lines = visible_batch.read_text(encoding='utf-8').splitlines()
+        visible_lines = '\n'.join(
+            line for line in batch_lines if line.strip().lower().startswith('echo ')
+        )
+        if re.search(r'\bv3\b', visible_lines, flags=re.I):
+            fail(errors, 'run_windows.bat 사용자 표시 문구에 v3가 남아 있습니다.')
 
 
     progress_text = (ROOT / 'progress_tracker.py').read_text(encoding='utf-8') if (ROOT / 'progress_tracker.py').is_file() else ''
@@ -277,7 +286,7 @@ def main() -> int:
     for required in ('_chart_detail_report', "'chart_detail': _chart_detail_report(facts)"):
         if required not in explain_text:
             fail(errors, f'원국 미리보기와 상세 해설 분리 계약 누락: {required}')
-    for required in ('chartDetailHtml', '네 기둥을 각각 보면', '계절과 균형'):
+    for required in ('chartDetailHtml', '네 기둥이 맡는 역할', '계절·강약·균형'):
         if required not in appjs_text:
             fail(errors, f'원국 상세 UI 구조 누락: {required}')
 
@@ -390,7 +399,10 @@ def main() -> int:
     leftovers = []
     for path in ROOT.rglob('*'):
         rel = path.relative_to(ROOT)
-        if any(part in {'.venv', 'venv', 'data', 'cache'} for part in rel.parts):
+        if any(
+            part in {'venv', 'data', 'cache'} or part.startswith('.venv')
+            for part in rel.parts
+        ):
             continue
         if path.is_file() and ('.bak' in path.name or path.suffix == '.pyc'):
             leftovers.append(str(rel))
@@ -401,7 +413,10 @@ def main() -> int:
 
     # Syntax-check every project Python file without generating __pycache__.
     for path in ROOT.rglob('*.py'):
-        if any(part in {'.venv', 'venv', '__pycache__', 'data', 'cache'} for part in path.relative_to(ROOT).parts):
+        if any(
+            part in {'venv', '__pycache__', 'data', 'cache'} or part.startswith('.venv')
+            for part in path.relative_to(ROOT).parts
+        ):
             continue
         try:
             source = path.read_text(encoding='utf-8')

@@ -19,15 +19,17 @@ if importlib.util.find_spec('lunar_python') is None:
     sys.modules.setdefault('bazi_engine', stub)
 
 from search_engine import (
+    _best_exact_per_year,
     _candidate_key,
     _facts_complete,
+    _facts_ranking_reproducible,
     _facts_recommendation_usable,
     _auto_cache_usable,
     _ranked_sources_reusable,
     ideal_from_auto,
 )
 from scoring import score_love, score_friend
-from services import _build_candidate_payloads
+from services import _build_candidate_payloads, _result_cache_usable
 from forceteller import _historical_data_roots, _legacy_profile_mapping
 from config import SETTINGS
 
@@ -97,6 +99,48 @@ def test_auto_cache_reuses_source_backed_rows_even_if_optional_fields_missing():
         'cache_meta': {'scoring_version': SETTINGS.scoring_version},
     }
     assert _auto_cache_usable(payload) is True
+
+
+def test_requested_top_ten_cache_is_not_reused_when_rows_are_truncated():
+    user = cached_source_facts(person('나', 1994, 12, 7, 'F', 5, 30), '丁亥')
+    target = cached_source_facts(person('후보', 1995, 4, 19, 'M', 15, 0), '壬子')
+    payload = {
+        'love': [export_candidate(user, target, 'love')],
+        'friend': [export_candidate(user, target, 'friend')],
+        'cache_meta': {
+            'scoring_version': SETTINGS.scoring_version,
+            'cache_identity': {'top_n': 10},
+        },
+    }
+    assert _auto_cache_usable(payload) is False
+
+    initial_payload = {
+        'auto_matches': payload,
+        'request_options': {'build_matches': True},
+        'cache_meta': {
+            'parser_version': SETTINGS.parser_version,
+            'scoring_version': SETTINGS.scoring_version,
+            'report_revision': SETTINGS.report_revision,
+            'reusable_sources': True,
+        },
+    }
+    assert _result_cache_usable(initial_payload) is False
+
+
+def test_local_facts_fill_missing_years_as_reproducible_provisional_candidates():
+    from dataclasses import replace
+
+    user = cached_source_facts(person('나', 1994, 12, 7, 'F', 5, 30), '丁亥')
+    local = replace(
+        cached_source_facts(person('예비후보', 1996, 8, 8, 'M', 13, 0), '甲子'),
+        source='local',
+        source_quality=0,
+    )
+    assert _facts_ranking_reproducible(local) is True
+    assert _facts_recommendation_usable(local) is False
+    winners = _best_exact_per_year(user, [local], 'love')
+    assert len(winners) == 1
+    assert winners[0].profile.name == '예비후보'
 
 
 def test_candidate_key_is_carried_through_ideal_and_pair_report_mapping():

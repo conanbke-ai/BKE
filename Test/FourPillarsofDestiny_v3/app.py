@@ -103,10 +103,8 @@ def api_progress_cancel(job_id: str):
 
 @app.get('/')
 def index():
-    # 로컬 개발에서는 입력 화면에서 테스트 데이터를 즉시 불러올 수 있게 fixture를 함께 전달합니다.
-    # 원격 사용자는 기존처럼 fixture를 전혀 받지 않습니다.
-    fixture = FULL_TEST_FIXTURE if _is_local_request() else None
-    return render_template('index.html', app_name=SETTINGS.app_name, test_mode=False, test_fixture=fixture)
+    # 일반 화면에는 로컬 접속이어도 개발용 인적 정보와 테스트 조작을 전달하지 않습니다.
+    return render_template('index.html', app_name=SETTINGS.app_name, test_mode=False, test_fixture=None)
 
 
 def _is_local_request() -> bool:

@@ -182,6 +182,21 @@ def _plain_user_text(text: str) -> str:
     ]
     for old, new in phrase_replacements:
         out = out.replace(old, new)
+    # 메인 생활 해설에는 전통 용어를 그대로 노출하지 않는다. 원래 용어와
+    # 수치 근거는 profile_local의 evidence 및 해석 근거 화면에 보존된다.
+    word_replacements = [
+        ('비견·겁재', '자기주도·동료 성향'), ('정인·편인', '학습·검토 성향'),
+        ('식신·상관', '표현·생산 성향'), ('정재·편재', '현실·자원 관리 성향'),
+        ('정관·편관', '책임·규칙 성향'), ('비겁', '자기주도·동료 성향'),
+        ('식상', '표현·생산 성향'), ('재성', '현실·자원 관리 성향'),
+        ('관성', '책임·규칙 성향'), ('인성', '학습·검토 성향'),
+        ('신강·신약', '에너지를 쓰는 방식'), ('용신', '균형을 위해 보완할 방향'),
+        ('일간', '나의 기본 반응'), ('일지', '가까운 관계에서의 생활 반응'),
+        ('십성', '생활 역할'), ('원국', '타고난 성향 구성'),
+        ('명리학', '전통 해석'), ('명리', '전통 해석'),
+    ]
+    for old, new in word_replacements:
+        out = out.replace(old, new)
     return out
 
 def _plain_dimensions(rows: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -656,14 +671,13 @@ def _personality_dimensions(facts: ForcetellerFacts) -> list[dict[str, str]]:
 
 
 def _personality_text(facts: ForcetellerFacts) -> str:
-    first_key, first = _dominant_style(facts)
-    second_key, second = _secondary_style(facts)
-    dm = facts.chart.day_master
+    _, first = _dominant_style(facts)
+    _, second = _secondary_style(facts)
     return (
         f'기본적으로 {first["label"]}을 중요하게 여기고, {second["label"]}이 그 방식을 보완하는 편입니다. '
-        f'즉 단순히 내향적·외향적이라기보다 “어떤 조건에서 편해지는가”가 더 분명합니다. '
-        f'{first["need"]}이 확보되면 장점이 잘 살아나고, {first["conflict"]} 상황에서는 방어적이거나 예민해질 수 있습니다. '
-        f'{stem_text(dm)}의 상징은 이런 기본 반응에 색을 더하는 요소로 보되, 실제 판단은 태어난 계절과 전체 사주 구조를 함께 봅니다.'
+        f'단순히 내향적·외향적이라고 나누기보다 “어떤 조건에서 마음이 편해지는가”가 더 분명한 사람에 가깝습니다. '
+        f'{first["need"]}이 확보되면 장점이 잘 살아나고, 반대로 {first["conflict"]} 상황이 반복되면 평소보다 방어적이거나 예민해질 수 있습니다. '
+        f'이럴 때는 성격이 나쁘다고 판단하기보다, 먼저 필요한 조건이 무엇인지 말로 정리하는 편이 도움이 됩니다.'
     )
 
 def _career_dimensions(facts: ForcetellerFacts) -> list[dict[str, str]]:
@@ -960,12 +974,12 @@ def build_profile_report(facts: ForcetellerFacts) -> dict[str, Any]:
 
     return {
         'overview': overview,
-        'personality': _personality_text(facts),
-        'study': _study_text(facts),
-        'career': _career_text(facts),
-        'wealth': _wealth_text(facts),
-        'relationships': _relationship_text(facts),
-        'romance': _romance_text(facts),
+        'personality': _plain_user_text(_personality_text(facts)),
+        'study': _plain_user_text(_study_text(facts)),
+        'career': _plain_user_text(_career_text(facts)),
+        'wealth': _plain_user_text(_wealth_text(facts)),
+        'relationships': _plain_user_text(_relationship_text(facts)),
+        'romance': _plain_user_text(_romance_text(facts)),
         'key_points': [dict(x, meaning=_plain_user_text(x.get('meaning', ''))) for x in _profile_key_points(facts)],
         'personality_dimensions': personality_dims,
         'career_dimensions': career_dims,
@@ -973,7 +987,7 @@ def build_profile_report(facts: ForcetellerFacts) -> dict[str, Any]:
         'relationship_dimensions': relationship_dims,
         'romance_dimensions': romance_dims,
         'study_dimensions': study_dims,
-        'deep_synthesis': deep,
+        'deep_synthesis': {key: _plain_user_text(value) for key, value in deep.items()},
         'elements': _element_sections(facts),
         'ten_gods': _ten_god_sections(facts),
         'visible_ten_gods': _visible_ten_gods(facts),
@@ -1459,4 +1473,3 @@ def build_pair_report(a: ForcetellerFacts, b: ForcetellerFacts, result: Compatib
             'description': ('두 사람 모두 출생시간이 확인되어 시주까지 포함했습니다.' if not time_unknown_names else '출생시간이 없는 사람은 시주를 임의로 생성하지 않았습니다. 확인 가능한 구조만 사용했습니다.'),
         },
     }
-

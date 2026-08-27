@@ -183,6 +183,16 @@ def _facts_recommendation_usable(facts: ForcetellerFacts) -> bool:
         and bool(facts.element_percent)
     )
 
+
+def _facts_ranking_reproducible(facts: ForcetellerFacts) -> bool:
+    """Whether the deterministic local scoring inputs can be reproduced.
+
+    Source-backed facts remain preferred, but a failed external detail lookup must not leave a
+    TOP 10 screen with only one or two cards.  Local calendar facts are clearly marked as
+    provisional and are safe to cache because the same birth input reproduces the same result.
+    """
+    return bool(str(facts.chart.day_pillar or '').strip()) and bool(facts.element_percent)
+
 def _best_exact_per_year(
     user_facts: ForcetellerFacts,
     facts_rows: Iterable[ForcetellerFacts],
@@ -192,18 +202,20 @@ def _best_exact_per_year(
     정밀 facts로 재채점한 뒤에도 연도별 1개 규칙을 다시 강제한다.
     연도별 shortlist 안의 후보를 세부 원국으로 다시 채점하고 최종 1명만 남긴다.
     """
-    winners: dict[int, MatchCandidate] = {}
+    verified_winners: dict[int, MatchCandidate] = {}
+    provisional_winners: dict[int, MatchCandidate] = {}
     for facts in facts_rows:
-        # 자동 추천의 공식 순위는 세부 원국 확인이 끝난 후보만 사용한다.
-        # 외부 확인에 실패한 local_fallback 후보가 정밀 후보처럼 1위를 차지하면
-        # Forceteller를 source-of-truth로 쓰는 계약을 깨므로 해당 실행에서는 제외한다.
-        if not _facts_recommendation_usable(facts):
+        if not _facts_ranking_reproducible(facts):
             continue
         result = score_love(user_facts, facts) if mode == 'love' else score_friend(user_facts, facts)
         item = MatchCandidate(facts.profile, facts, result)
-        current = winners.get(facts.profile.year)
+        target = verified_winners if _facts_recommendation_usable(facts) else provisional_winners
+        current = target.get(facts.profile.year)
         if current is None or item.result.total > current.result.total:
-            winners[facts.profile.year] = item
+            target[facts.profile.year] = item
+    # A source-backed row always wins its birth-year slot.  Other years remain visible as
+    # provisional local candidates instead of disappearing from the requested TOP 10.
+    winners = {**provisional_winners, **verified_winners}
     return sorted(winners.values(), key=lambda c: c.result.total, reverse=True)
 
 
@@ -213,7 +225,7 @@ def _source_status(facts: ForcetellerFacts) -> dict:
     label = (
         '세부 원국 자료 확인 완료'
         if verified else
-        ('저장된 원국 자료 사용 · 일부 세부 항목은 보수 계산' if source_backed else '기본 원국 계산 기준')
+        ('저장된 원국 자료 사용 · 일부 세부 항목은 보수 계산' if source_backed else '기본 원국 계산 기준 · 세부 원국 확인 전 예비 후보')
     )
     return {'verified': verified, 'source_backed': source_backed, 'label': label, 'quality': facts.source_quality}
 
@@ -256,6 +268,21 @@ def _ranked_sources_reusable(payload: object) -> bool:
         return False
 
 
+def _ranked_rows_reproducible(payload: object) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    rows = [*(payload.get('love') or []), *(payload.get('friend') or [])]
+    if not rows:
+        return False
+    try:
+        return all(
+            _facts_ranking_reproducible(forceteller_facts_from_dict(row.get('facts') or {}))
+            for row in rows
+        )
+    except Exception:
+        return False
+
+
 def _auto_cache_usable(payload: object) -> bool:
     """Recommendation cache validity is based on scoring inputs, not UI/parser revision.
 
@@ -267,7 +294,11 @@ def _auto_cache_usable(payload: object) -> bool:
     meta = payload.get('cache_meta') or {}
     if meta.get('scoring_version') != SETTINGS.scoring_version:
         return False
-    return _ranked_sources_reusable(payload)
+    requested = int((meta.get('cache_identity') or {}).get('top_n') or 0)
+    if requested:
+        if len(payload.get('love') or []) < requested or len(payload.get('friend') or []) < requested:
+            return False
+    return _ranked_rows_reproducible(payload)
 
 def search_auto_matches(
     user_facts: ForcetellerFacts,
@@ -309,7 +340,21 @@ def search_auto_matches(
         if progress_callback:
             progress_callback(0.72 + frac * 0.24, message)
 
-    collected = _collect_union(love_shortlist, friend_shortlist, progress_callback=collect_progress)
+    # Older caches may contain only the few candidates whose remote detail pages happened to
+    # succeed.  Keep those verified facts, but do not repeat the entire remote collection just
+    # to fill the visible TOP 10.  The newly scanned shortlist can be scored deterministically
+    # with local facts and is marked provisional in the UI.
+    if _ranked_sources_reusable(cached):
+        collected: dict[tuple, ForcetellerFacts] = {}
+        for _, profile in love_shortlist + friend_shortlist:
+            collected[_profile_identity(profile)] = local_facts(profile)
+        for row in [*(cached.get('love') or []), *(cached.get('friend') or [])]:
+            facts = forceteller_facts_from_dict(row.get('facts') or {})
+            collected[_profile_identity(facts.profile)] = facts
+        if progress_callback:
+            progress_callback(0.96, '확인된 후보는 유지하고 TOP 10의 빈자리를 정리하고 있어요.')
+    else:
+        collected = _collect_union(love_shortlist, friend_shortlist, progress_callback=collect_progress)
     love_candidates = _best_exact_per_year(user_facts, collected.values(), 'love')[:SETTINGS.top_n]
     friend_candidates = _best_exact_per_year(user_facts, collected.values(), 'friend')[:SETTINGS.top_n]
 
@@ -325,6 +370,7 @@ def search_auto_matches(
         payload = c.as_dict()
         payload['candidate_key'] = _candidate_key(c.profile)
         payload['source_status'] = _source_status(c.facts)
+        payload['ranking_tier'] = 'verified' if _facts_recommendation_usable(c.facts) else 'provisional'
         payload['age_meta'] = _age_meta(c.profile)
         return payload
 
@@ -337,7 +383,7 @@ def search_auto_matches(
             'older_years': older,
             'younger_years': younger,
             'shortlist_per_year': SETTINGS.auto_shortlist_per_year,
-            'rule': '모든 날짜·12시진을 로컬 구조로 1차 비교한 뒤 연도별 상위 후보를 세부 원국으로 재확인하고, 최종 순위에는 출생연도별 1개만 포함',
+            'rule': '모든 날짜·12시진을 로컬 구조로 비교하고 출생연도별 1명만 남깁니다. 세부 원국 확인 후보를 우선하며, 확인 실패로 순위가 부족하면 로컬 원국 기반 예비 후보로 TOP 10을 채웁니다.',
         },
         'evaluated_local_birth_datetimes': evaluated,
         'collected_unique_profiles': len(collected),
@@ -348,6 +394,8 @@ def search_auto_matches(
     all_shortlist_reusable = all(_facts_recommendation_usable(f) for f in collected.values())
     usable_count = sum(1 for f in collected.values() if _facts_recommendation_usable(f))
     ranked_sources_reusable = _ranked_sources_reusable(payload)
+    ranked_rows_reproducible = _ranked_rows_reproducible(payload)
+    display_complete = len(payload['love']) >= SETTINGS.top_n and len(payload['friend']) >= SETTINGS.top_n
     payload['usable_unique_profiles'] = usable_count
     payload['cache_meta'] = {
         'parser_version': SETTINGS.parser_version,
@@ -355,6 +403,8 @@ def search_auto_matches(
         'complete_sources': complete_sources,
         # A failed non-winning shortlist row must not invalidate an already reproducible TOP list.
         'reusable_sources': ranked_sources_reusable,
+        'reproducible_rows': ranked_rows_reproducible,
+        'display_complete': display_complete,
         'all_shortlist_reusable': all_shortlist_reusable,
         'unusable_shortlist_profiles': max(0, len(collected) - usable_count),
         'cache_policy': 'cache_first_manual_refresh',
@@ -363,7 +413,7 @@ def search_auto_matches(
     # Cache the displayed recommendation set as soon as every displayed row has reproducible
     # source-backed facts.  Older behavior required every temporary shortlist row to succeed;
     # one failed loser therefore caused the entire 49-profile source pass to repeat next run.
-    if ranked_sources_reusable and payload['love'] and payload['friend']:
+    if ranked_rows_reproducible and payload['love'] and payload['friend']:
         write_json(result_cache, payload)
     return payload
 
@@ -393,5 +443,3 @@ def ideal_from_auto(auto_rows: list[dict], top_n: int | None = None) -> list[dic
         if len(result) >= top_n:
             break
     return result
-
-
