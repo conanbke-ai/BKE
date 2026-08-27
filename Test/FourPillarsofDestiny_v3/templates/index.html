@@ -6,9 +6,9 @@
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#fff2f7">
   <title>{{ app_name }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260827-rainbow-cloud-18') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260827-rainbow-cloud-19') }}">
 </head>
-<body class="intro-active" data-test-mode="{{ 'true' if test_mode else 'false' }}" data-test-fixture-available="{{ 'true' if test_fixture else 'false' }}" data-bunny-src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260827-rainbow-cloud-18') }}">
+<body class="intro-active" data-test-mode="{{ 'true' if test_mode else 'false' }}" data-test-fixture-available="{{ 'true' if test_fixture else 'false' }}" data-bunny-src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260827-rainbow-cloud-19') }}">
   <div class="cloud cloud-a" aria-hidden="true"></div>
   <div class="cloud cloud-b" aria-hidden="true"></div>
   <div id="bunnyCursor" class="bunny-cursor" aria-hidden="true">
@@ -26,7 +26,7 @@
           <div><span>토끼가 차근차근 풀어주는 사주 노트</span><strong>나의 사주 리포트</strong><p>내 사주와 운세부터 궁합까지 한 번에 살펴봐요.</p></div>
           <span class="intro-fallback-bunny">🐰</span>
         </div>
-        <img class="intro-splash-image" src="{{ url_for('static', filename='assets/intro-splash.png', v='20260827-rainbow-cloud-18') }}" alt="토끼가 차근차근 풀어주는 나의 사주 리포트 시작 화면" onerror="this.classList.add('asset-failed')">
+        <img class="intro-splash-image" src="{{ url_for('static', filename='assets/intro-splash.png', v='20260827-rainbow-cloud-19') }}" alt="토끼가 차근차근 풀어주는 나의 사주 리포트 시작 화면" onerror="this.classList.add('asset-failed')">
         <div class="intro-mobile-copy">
           <span>RAINBOW SAJU NOTE ✦</span>
           <strong>나의 사주<br>리포트</strong>
@@ -45,7 +45,7 @@
     <section id="onboarding" class="onboarding input-screen card bunny-surface hidden">
       <header class="input-screen-head">
         <div class="input-header-art" aria-hidden="true">
-          <img class="input-header-static-image" src="{{ url_for('static', filename='assets/input-header-rainbow-v2.png', v='20260827-rainbow-cloud-18') }}" alt="">
+          <img class="input-header-static-image" src="{{ url_for('static', filename='assets/input-header-rainbow-v2.png', v='20260827-rainbow-cloud-19') }}" alt="">
         </div>
         <button id="inputBackButton" class="input-back-button" type="button" aria-label="시작 화면으로 돌아가기">
           <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7M9 12h10"/></svg>
@@ -182,7 +182,7 @@
 
     <section id="workspace" class="workspace hidden">
       <header class="report-header card rainbow-topbar">
-        <div class="topbar-brand compact-brand"><div class="approved-bunny-logo" aria-hidden="true"><img src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260827-rainbow-cloud-18') }}" alt=""></div><div><span class="workspace-mini-kicker">MY SAJU NOTE ✦</span><h1 id="workspaceTitle">나의 사주 리포트</h1></div></div>
+        <div class="topbar-brand compact-brand"><div class="approved-bunny-logo" aria-hidden="true"><img src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260827-rainbow-cloud-19') }}" alt=""></div><div><span class="workspace-mini-kicker">MY SAJU NOTE ✦</span><h1 id="workspaceTitle">나의 사주 리포트</h1></div></div>
         <div class="header-actions"><button id="printButton" class="ghost-button compact-reset" type="button">인쇄·PDF</button><button id="resetButton" class="ghost-button compact-reset" type="button">정보 수정</button></div>
       </header>
       <nav class="main-nav compact-nav candy-launcher card" aria-label="리포트 메뉴">
@@ -210,9 +210,9 @@
         <span class="loading-stage-star star-b">✧</span>
         <span class="loading-stage-star star-c">♡</span>
         <picture class="loading-bunny-sprite">
-          <source media="(prefers-reduced-motion: reduce)" srcset="{{ url_for('static', filename='assets/loading-bunny-hop-fallback.png', v='20260827-rainbow-cloud-18') }}">
-          <source type="image/webp" srcset="{{ url_for('static', filename='assets/loading-bunny-hop.webp', v='20260827-rainbow-cloud-18') }}">
-          <img src="{{ url_for('static', filename='assets/loading-bunny-hop-fallback.png', v='20260827-rainbow-cloud-18') }}" alt="깡총깡총 뛰는 토끼">
+          <source media="(prefers-reduced-motion: reduce)" srcset="{{ url_for('static', filename='assets/loading-bunny-hop-fallback.png', v='20260827-rainbow-cloud-19') }}">
+          <source type="image/webp" srcset="{{ url_for('static', filename='assets/loading-bunny-hop.webp', v='20260827-rainbow-cloud-19') }}">
+          <img src="{{ url_for('static', filename='assets/loading-bunny-hop-fallback.png', v='20260827-rainbow-cloud-19') }}" alt="깡총깡총 뛰는 토끼">
         </picture>
       </div>
       <strong id="loadingTitle">리포트를 만들고 있어요</strong>
@@ -230,6 +230,6 @@
   {% if test_mode and test_fixture %}
   <script id="testFixtureData" type="application/json">{{ test_fixture|tojson }}</script>
   {% endif %}
-  <script src="{{ url_for('static', filename='app.js', v='20260827-rainbow-cloud-18') }}"></script>
+  <script src="{{ url_for('static', filename='app.js', v='20260827-rainbow-cloud-19') }}"></script>
 </body>
 </html>
