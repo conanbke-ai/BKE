@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-15' in html
+    assert '20260827-rainbow-cloud-16' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -94,7 +94,11 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert '.member-remove-button{' in css
     assert 'data-remove-member' in js
     assert 'function bindMemberRemoval(' in js
-    assert "actionLabel:'되돌리기'" in js
+    assert 'const memberUndoHistory=[]' in js
+    assert 'function undoLastMemberRemoval()' in js
+    assert 'memberUndoHistory.push({card,parent,next,index,root,minimum,onChange})' in js
+    assert '...memberUndoHistory.map(item=>item.card.dataset.personPrefix' in js
+    assert "`되돌리기 (${count})`" in js
     assert "parent.insertBefore(card" in js
     assert '.toast-action' in css
     assert 'd.expected_seconds??d.estimated_seconds??d.seconds' in js
