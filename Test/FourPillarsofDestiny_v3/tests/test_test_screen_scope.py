@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-16' in html
+    assert '20260827-rainbow-cloud-18' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -90,7 +90,8 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert 'width:min(100%,318px)' in css
     assert '.member-add-bunny::before,.member-add-bunny::after' in css
     assert 'background-position:right 17px center' in css
-    assert 'grid-template-columns:18px minmax(0,1fr) 18px' in css
+    assert '.input-back-button{display:inline-flex;width:auto;min-width:0;height:42px;gap:6px' in css
+    assert '.input-back-button .ui-icon{width:26px;height:26px;padding:5px;border-radius:50%' in css
     assert '.member-remove-button{' in css
     assert 'data-remove-member' in js
     assert 'function bindMemberRemoval(' in js
@@ -104,6 +105,8 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert 'd.expected_seconds??d.estimated_seconds??d.seconds' in js
     assert 'include_pair:f.elements.include_pair.checked' in js
     assert 'group_members:groupExtra?groupExtra+1:0' in js
+    assert "value.name||pairName||value.label" in js
+    assert "pairName&&value.label?value.label:''" in js
     assert 'mask-image:linear-gradient(90deg,transparent 0%' in css
     assert 'background:linear-gradient(105deg,#ef4f8e 0%,#f36f98 62%,#f69a88 100%)' in css
 
