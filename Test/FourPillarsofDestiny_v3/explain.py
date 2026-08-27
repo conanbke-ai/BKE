@@ -137,31 +137,31 @@ STYLE_LIBRARY = {
         'label':'자기 기준과 자율', 'need':'내 선택권과 개인 영역이 존중되는 것',
         'talk':'결론을 일방적으로 통보하기보다 선택 과정에 참여시키는 대화',
         'work':'담당 영역을 스스로 결정하고 끝까지 책임지는 역할',
-        'conflict':'주도권이나 책임 경계가 겹치면 피로가 커질 수 있음',
+        'conflict':'주도권이나 책임 경계가 겹치는',
     },
     'output': {
         'label':'표현과 결과물', 'need':'생각과 감정에 실제 반응이 돌아오는 것',
         'talk':'핵심을 빨리 말하고 피드백을 주고받는 대화',
         'work':'아이디어를 제안하고 문제를 개선해 결과물로 만드는 역할',
-        'conflict':'답답함이 쌓이면 말이 빨라지거나 날카로워질 수 있음',
+        'conflict':'답답함이 쌓여 말이 빨라지거나 날카로워지는',
     },
     'wealth': {
         'label':'현실성과 실행', 'need':'약속이 말에 그치지 않고 일정·행동으로 이어지는 것',
         'talk':'누가 언제 무엇을 할지 구체적으로 정하는 대화',
         'work':'일정·자원·마감과 실제 성과를 챙기는 역할',
-        'conflict':'시간·돈·책임 배분이 모호할 때 불만이 생기기 쉬움',
+        'conflict':'시간·돈·책임 배분이 모호한',
     },
     'officer': {
         'label':'기준과 책임', 'need':'관계나 역할의 기준이 일관되고 약속이 지켜지는 것',
         'talk':'기준과 이유를 분명히 하고 합의한 규칙을 지키는 대화',
         'work':'기준·품질·책임선을 정리하고 운영을 안정시키는 역할',
-        'conflict':'기준이 자주 바뀌거나 책임만 떠넘겨지면 스트레스가 커질 수 있음',
+        'conflict':'기준이 자주 바뀌거나 책임만 떠넘겨지는',
     },
     'resource': {
         'label':'이해와 검토', 'need':'충분히 이해하고 생각을 정리할 시간과 안정감이 주어지는 것',
         'talk':'배경과 이유를 설명하고 생각할 시간을 주는 대화',
         'work':'정보를 모으고 검토해 전문성·근거를 보강하는 역할',
-        'conflict':'재촉을 받으면 더 말이 줄거나 결정을 미룰 수 있음',
+        'conflict':'충분한 설명 없이 재촉받는',
     },
 }
 
@@ -225,7 +225,7 @@ def _plain_profile_summary(facts: ForcetellerFacts) -> str:
     name = facts.profile.name or '이 사람'
     return (
         f'{name}은 중요한 일을 판단할 때 **{first["need"]}**이 먼저 필요하고, 그다음 **{second["need"]}**까지 확인해야 마음이 정리되는 편입니다. '
-        f'일에서는 **{first["work"]}**에서 강점이 잘 드러나고, 대화에서는 {first["talk"]}이 잘 맞습니다. '
+        f'일에서는 **{first["work"]}**에서 강점이 잘 드러나고, 대화에서는 {first["talk"]} 방식이 잘 맞습니다. '
         f'반대로 {first["conflict"]} 상황이 반복되면 내용 자체보다 과정에서 더 피로해질 수 있습니다.'
     )
 
@@ -751,7 +751,7 @@ def _relationship_text(facts: ForcetellerFacts) -> str:
     _, second = _secondary_style(facts)
     return (
         f'관계에서는 {first["need"]}을 중요하게 느끼는 편입니다. 친해졌다고 해서 모든 시간을 공유하기보다, '
-        f'{first["talk"]}이 지켜질 때 편안함이 오래갑니다. {second["label"]} 성향도 함께 있어 관계가 깊어질수록 '
+        f'{first["talk"]} 방식이 지켜질 때 편안함이 오래갑니다. {second["label"]} 성향도 함께 있어 관계가 깊어질수록 '
         f'{second["need"]} 역시 중요해질 수 있습니다. 그래서 “연락을 많이 하느냐”보다 약속·경계·피드백 방식이 맞는지가 실제 체감에 더 크게 작용합니다.'
     )
 
@@ -932,7 +932,7 @@ def _deep_synthesis(facts: ForcetellerFacts) -> dict[str, str]:
     _, first = _dominant_style(facts)
     _, second = _secondary_style(facts)
     return {
-        'personality': f'핵심은 {first["label"]}과 {second["label"]}이 같이 작동한다는 점입니다. 평소에는 {first["talk"]}이 편하지만 상황에 따라 {second["talk"]}도 필요합니다. 한쪽만 강요되는 환경보다 두 방식을 번갈아 쓸 수 있을 때 훨씬 자연스럽습니다.',
+        'personality': f'핵심은 {first["label"]}과 {second["label"]}이 같이 작동한다는 점입니다. 평소에는 {first["talk"]} 방식이 편하지만 상황에 따라 {second["talk"]} 방식도 필요합니다. 한쪽만 강요되는 환경보다 두 방식을 번갈아 쓸 수 있을 때 훨씬 자연스럽습니다.',
         'career': f'직장에서는 {first["work"]}을 중심 역할로 두고, {second["work"]}을 보조 역할로 배치하면 강점을 쓰기 쉽습니다. 직무명보다 실제로 어떤 권한을 받고 어떤 방식으로 평가받는지 확인하는 것이 더 중요합니다.',
         'wealth': '재물은 “돈복”보다 돈을 벌게 만드는 일의 구조, 반복 지출, 저축 규칙, 사람과 돈이 섞일 때의 경계를 따로 보는 편이 유용합니다. 기술이나 전문성이 수입으로 연결되는 경로를 만드는 것이 핵심입니다.',
         'relationships': f'사람 관계에서는 {first["need"]}이 기본 욕구에 가깝습니다. 상대가 이 부분을 존중하면 편안하지만, 반대로 {first["conflict"]} 상황이 반복되면 작은 일도 누적될 수 있습니다.',
@@ -1187,7 +1187,7 @@ def _love_practical_sections(a: ForcetellerFacts, b: ForcetellerFacts, sa: dict[
         f'한쪽이 애정을 주고 있다고 생각해도 상대가 원하는 방식과 다르면 서운함이 생길 수 있으므로, 힘들 때 원하는 반응과 혼자 있고 싶은 시간을 직접 말하는 편이 좋습니다.'
     )
     communication_daily = (
-        f'**{a_name}에게는** {sa["talk"]}이 잘 맞고, **{b_name}에게는** {sb["talk"]}이 잘 맞습니다. '
+        f'**{a_name}에게는** {sa["talk"]} 방식이 잘 맞고, **{b_name}에게는** {sb["talk"]} 방식이 잘 맞습니다. '
         '평소 연락은 횟수보다 답장이 늦을 때 어떻게 이해할지, 바쁜 날 최소한 어떤 신호를 줄지, 약속 변경은 언제까지 알려줄지를 맞추는 것이 실제 체감에 중요합니다.'
     )
     physical = (
@@ -1262,7 +1262,7 @@ def _pair_sections(a: ForcetellerFacts, b: ForcetellerFacts, result: Compatibili
         f'예를 들어 한쪽이 빨리 결론을 내리려는 순간 다른 쪽이 설명이나 생각할 시간을 원하면, 내용보다 속도 차이 때문에 감정이 상할 수 있습니다.'
     )
     communication = (
-        f'{a.profile.name}에게는 {sa["talk"]}이 효과적이고, {b.profile.name}에게는 {sb["talk"]}이 효과적입니다. '
+        f'{a.profile.name}에게는 {sa["talk"]} 방식이 효과적이고, {b.profile.name}에게는 {sb["talk"]} 방식이 효과적입니다. '
         '갈등 때는 “누가 맞는가”부터 정하지 말고, 각자 원하는 결론·필요한 정보·결정 시점을 한 문장씩 확인한 뒤 합의하는 방식이 좋습니다.'
     )
     role_split = (
@@ -1325,7 +1325,7 @@ def _pair_sections(a: ForcetellerFacts, b: ForcetellerFacts, result: Compatibili
             'daily_life': f'함께 일하거나 활동할 때 {a.profile.name}은 {sa["work"]}, {b.profile.name}은 {sb["work"]}이 자연스럽습니다. 일정 공유, 결정권, 검토 시점을 미리 정하면 서로의 방식 차이가 장점으로 바뀌기 쉽습니다.',
             'long_term': '오래 함께 일하려면 친밀감보다 역할과 기대치가 예측 가능해야 합니다. 누가 제안하고, 누가 검토하고, 누가 최종 결정하며, 문제가 생기면 누구에게 먼저 알릴지를 정해 두는 것이 좋습니다.',
             'ten_gods': '십성은 협업·표현·지원·책임·현실 실행의 차이를 보는 보조 근거로만 사용합니다.',
-            'decision': f'의사결정에서는 {a.profile.name}에게는 {sa["talk"]}, {b.profile.name}에게는 {sb["talk"]}이 필요합니다. 큰 결정을 할 때는 제안자와 최종 결정자를 분리하고 검토 시간을 명시하면 좋습니다.',
+            'decision': f'의사결정에서는 {a.profile.name}에게는 {sa["talk"]} 방식이, {b.profile.name}에게는 {sb["talk"]} 방식이 필요합니다. 큰 결정을 할 때는 제안자와 최종 결정자를 분리하고 검토 시간을 명시하면 좋습니다.',
             'feedback': f'피드백은 {a.profile.name}에게 {sa["talk"]}, {b.profile.name}에게 {sb["talk"]} 방식으로 전달하는 편이 좋습니다. 공개석상에서 즉흥적으로 교정하기보다 기대 결과와 수정 시점을 함께 말하면 갈등을 줄일 수 있습니다.',
         })
         if context == 'work':
@@ -1334,7 +1334,7 @@ def _pair_sections(a: ForcetellerFacts, b: ForcetellerFacts, result: Compatibili
                 'intimacy': day_sentence.replace('배우자', '업무 관계').replace('친밀감', '협업 리듬') + ' 가까이 협업할 때 반복되기 쉬운 반응 속도와 기준 차이를 참고하는 항목입니다.',
                 'daily_life': f'실무에서는 {a.profile.name}에게 {sa["work"]}, {b.profile.name}에게 {sb["work"]}을 우선 배치해 보세요. 요청할 때는 목적·마감·완료 기준을 한 번에 전달하고, 중간 검토가 필요한 사람과 최종 결정자를 미리 구분하는 편이 좋습니다.',
                 'long_term': '장기 협업에서는 책임선과 피드백 규칙을 예측 가능하게 만드는 것이 중요합니다. 누가 초안을 만들고, 누가 검토하고, 누가 최종 승인하는지 고정하면 반복 갈등을 줄일 수 있습니다.',
-                'decision': f'{a.profile.name}은 결정을 받을 때 {sa["talk"]}이 편하고, {b.profile.name}은 {sb["talk"]}이 편합니다. 회의에서는 결론·근거·담당자·마감 네 가지를 분리해 확인하는 방식이 효과적입니다.',
+                'decision': f'{a.profile.name}은 결정을 받을 때 {sa["talk"]} 방식이 편하고, {b.profile.name}은 {sb["talk"]} 방식이 편합니다. 회의에서는 결론·근거·담당자·마감 네 가지를 분리해 확인하는 방식이 효과적입니다.',
                 'feedback': f'{a.profile.name}에게는 {sa["talk"]}, {b.profile.name}에게는 {sb["talk"]} 방식으로 피드백하는 편이 좋습니다. 사람 평가처럼 들리지 않게 현재 결과물에서 바꿀 부분과 다음 확인 시점을 함께 말해 주세요.',
             })
         elif context == 'family':

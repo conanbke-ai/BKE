@@ -73,3 +73,19 @@ def test_main_profile_copy_translates_technical_terms_to_daily_language(monkeypa
     assert '타고난 성향 구성' in plain
     assert '나의 기본 반응' in plain
     assert '균형을 위해 보완할 방향' in plain
+
+
+def test_generated_daily_language_uses_natural_korean_particles(monkeypatch):
+    explain = _load_explain(monkeypatch)
+    facts = _facts(explain, name='문장검수', day_pillar='丁卯', stars=[], positions={})
+    facts.ten_gods.update({'정인': 35, '비견': 20})
+
+    copy = ' '.join([
+        explain._plain_profile_summary(facts),
+        explain._relationship_text(facts),
+        *explain._deep_synthesis(facts).values(),
+    ])
+
+    assert '대화이' not in copy
+    assert '있음 상황' not in copy
+    assert '대화 방식이' in copy

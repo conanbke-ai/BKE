@@ -59,7 +59,10 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-21' in html
+    assert '20260827-rainbow-cloud-26' in html
+    assert '<h1>나만의 사주 이야기</h1>' in html
+    assert '.input-screen-title{z-index:3;margin-left:92px}' in css
+    assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -111,6 +114,26 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert 'background:linear-gradient(105deg,#ef4f8e 0%,#f36f98 62%,#f69a88 100%)' in css
     assert 'rgba(255,226,239,.9)' in css
     assert 'linear-gradient(145deg,#fff7fb 0%,#ffe9f2 100%)' in css
+
+
+def test_report_readability_redesign_keeps_cute_icons_and_structured_content():
+    root = Path(__file__).resolve().parents[1]
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+
+    assert 'const CUTE_PATHS=' in js
+    assert 'function cuteIcon(' in js
+    assert 'class="pillar-glyph"' in js
+    assert 'class="fortune-full-copy"' in js
+    assert '/static/assets/report-bunny-badge.png' in js
+    assert '님의 성향과 흐름을' in js
+    assert '생활 언어로 읽어드려요' not in js
+    assert '/* calm, readable report system */' in css
+    assert 'border-image:none' in css
+    assert '.plain-key-grid article{display:grid;grid-template-columns:36px' in css
+    assert '.fortune-card:has(details[open])' in css
+    assert '.score-ring strong::before{content:"그룹 균형"' in css
+    assert '.test-mode-badge,.test-fixture-summary{display:none}' in css
 
 
 def test_cute_icon_language_connects_report_scores_and_relationship_tones():
