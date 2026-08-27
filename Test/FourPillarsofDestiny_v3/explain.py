@@ -233,7 +233,7 @@ _STAR_HELP = {'천을귀인','천덕귀인','월덕귀인','태극귀인','문�
 _STAR_ATTRACTION = {'도화살','홍염살','천희성','천희귀인','년살'}
 _STAR_LEARNING = {'문창귀인','문곡귀인','학당귀인','태극귀인','천문성','화개살','귀문관살','천의성'}
 _STAR_MOVEMENT = {'역마살','지살'}
-_STAR_INDEPENDENCE = {'고신살','과숙살','화개살'}
+_STAR_INDEPENDENCE = {'고신살','과숙살','화개살','심성'}
 _STAR_FORCE = {'양인살','괴강살','백호살','백호대살','장성살','현침살'}
 _STAR_FRICTION = {'원진살','육해살','망신살','겁살','재살','천살','월살'}
 
@@ -312,7 +312,11 @@ def _star_practical(name: str, positions: list[str], facts: ForcetellerFacts) ->
 def _star_personal_note(name: str, positions: list[str], facts: ForcetellerFacts) -> str:
     day = str(facts.chart.day_pillar or '')
     reading = _pillar_reading(day) if day else '일주 미확인'
-    pos = ' · '.join(positions) if positions else '위치 미확인'
+    if not positions:
+        if day:
+            return f'{facts.profile.name}의 일주는 {day}({reading}주)이고, {name}은 원국 전체 참고 항목으로 표시되어 있습니다. 특정 기둥 하나에 고정하지 않고 실제 생활에서 반복되는 장면이 있는지 보조적으로 확인합니다.'
+        return f'{name}은 원국 전체 참고 항목입니다. 특정 기둥 하나에 고정하지 않고 실제 생활에서 반복되는 장면이 있는지 보조적으로 확인합니다.'
+    pos = ' · '.join(positions)
     if day:
         return f'{facts.profile.name}의 일주는 {day}({reading}주)이고, {name}은 {pos}에서 확인됩니다. 같은 {name}이라도 어느 기둥에 놓였는지에 따라 체감되는 생활 영역을 다르게 봅니다.'
     return f'{name}은 {pos}에서 확인됩니다. 신살 이름만 보지 않고 어느 기둥에서 확인되는지를 함께 봅니다.'

@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-26' in html
+    assert '20260827-rainbow-cloud-35' in html
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -123,9 +123,9 @@ def test_report_readability_redesign_keeps_cute_icons_and_structured_content():
 
     assert 'const CUTE_PATHS=' in js
     assert 'function cuteIcon(' in js
-    assert 'class="pillar-glyph"' in js
+    assert 'class="pillar-part ${position} ${visual.tone}"' in js
     assert 'class="fortune-full-copy"' in js
-    assert '/static/assets/report-bunny-badge.png' in js
+    assert '/static/assets/report-bunny-badge.png' not in js
     assert '님의 성향과 흐름을' in js
     assert '생활 언어로 읽어드려요' not in js
     assert '/* calm, readable report system */' in css
@@ -134,6 +134,31 @@ def test_report_readability_redesign_keeps_cute_icons_and_structured_content():
     assert '.fortune-card:has(details[open])' in css
     assert '.score-ring strong::before{content:"그룹 균형"' in css
     assert '.test-mode-badge,.test-fixture-summary{display:none}' in css
+    assert 'function compactNatalChart(' in js
+    assert 'return reportNatalChart(facts,profile.chart_detail||{},label)' in js
+    assert "compactNatalChart(row.facts,report.person_b||{},'후보 원국')" in js
+    assert "section('상대의 원국'" in js
+    assert "section('상대의 신살·길성 참고'" in js
+    assert 'class="target-star-reference"' in js
+    assert 'class="target-domain-grid"' in js
+    assert 'class="pair-person-grid"' in js
+    assert js.index("section('상대의 원국'") < js.index('class="hero-summary pair-hero card"')
+    pair = js[js.index('function renderPair('):js.index('async function submitPair(')]
+    assert pair.index("section('생활 속에서 미리 확인할 것'") < pair.index("section('상대의 신살·길성 참고'")
+    assert pair.index("section('상대의 신살·길성 참고'") < pair.index("section('점수 축과 해석 근거'")
+    assert 'strong.reading-highlight{display:inline!important' in css
+    assert 'class="fortune-detail-groups"' in js
+    assert 'function activeDaewoonIndex(' in js
+    assert 'class="daewoon-period-button' in js
+    assert 'id="daewoonSelected"' in js
+    assert 'daewoonDetail(periods[currentIndex]||{},currentIndex,true)' in js
+    assert '.daewoon-timeline{position:relative;display:flex' in css
+    assert '.daewoon-selected-card' in css
+    assert 'class="daewoon-focus-row"' in js
+    assert 'class="daewoon-selected-summary"' not in js
+    assert '.fortune-detail-block li::before' in css
+    assert 'function friendlyStarText(' in js
+    assert "replace(/위치 미확인/g,'원국 전체 참고')" in js
 
 
 def test_cute_icon_language_connects_report_scores_and_relationship_tones():
@@ -180,15 +205,109 @@ def test_profile_dashboard_separates_plain_language_from_special_star_evidence()
 def test_group_dashboard_reads_member_facts_and_visualizes_scores_by_tone():
     root = Path(__file__).resolve().parents[1]
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
 
     assert 'function groupMemberFacts(data,r)' in js
     assert 'data?.members' in js
     assert 'state.result?.initial_group?.members' in js
     assert 'groupNetworkHtml(r,data)' in js
+    assert 'class="group-map-layout"' in js
+    assert 'function elementLink(' in js
+    assert 'function groupPairInspector(' in js
+    assert 'function personRelationList(' in js
+    assert "box.classList.add('person-selected')" in js
+    assert 'relatedRows.slice(0,3)' in js
+    assert 'relatedRows.slice(-2)' in js
+    assert 'data-group-score=' in js
+    assert 'class="pair-inspector-at-glance"' in js
+    assert '.group-network-map.person-selected .group-connection.connected' in css
+    assert '.group-network-map .group-node.dimmed' in css
+    assert '.group-connection.balanced .connection-line{stroke:#d2a92d;stroke-dasharray:5 2}' in css
+    assert '.group-connection.friction .connection-line{stroke:#df607b;stroke-dasharray:.7 1.8}' in css
+    assert '.pair-inspector-details{grid-template-columns:1fr}' in css
+    assert "readingCard('잘 맞는 점'" in js
+    assert "readingCard('조율할 점'" in js
+    assert "readingCard('대화 방법'" in js
+    assert 'class="pair-inspector-details"' in js
+    assert '.pair-inspector-details .reading-card p' in css
+    assert 'font-size:13px;line-height:1.76' in css
+    assert 'class="group-map-reading-guide"' in js
+    assert '선이 없어도 관계가 없는 것은 아니에요' in js
+    assert '편안한 연결 3개' in js
+    assert '조율할 연결 2개' in js
+    assert 'aria-label="${esc(point.name)}님의 대표 관계 확인"' in js
+    assert '관계 묶음' not in js
     assert 'function matrixTone(score)' in js
     assert 'matrix-score ${matrixTone(score)}' in js
+
+
+def test_profile_starts_with_visual_natal_chart_before_plain_summary():
+    root = Path(__file__).resolve().parents[1]
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+
+    profile = js[js.index('function renderProfile('):js.index('function fortuneDetailBlock(')]
+    assert profile.index('top-natal-dashboard') < profile.index('text-only-profile-hero')
+    assert 'integrated-bunny' not in profile
+    assert 'function pillarPart(' in js
+    assert 'class="natal-board-guide"' in js
+    assert 'class="pillar-part ${position} ${visual.tone}"' in js
+    assert '.top-natal-dashboard' in css
+    assert '.text-only-profile-hero{min-height:0;grid-template-columns:minmax(0,1fr)' in css
     assert 'function groupedRoleCards(roles=[]' in js
     assert '같은 역할은 한 번만 설명하고' in js
+
+
+def test_pair_and_top10_use_calm_structured_emphasis_cards():
+    root = Path(__file__).resolve().parents[1]
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+
+    assert 'function emphasisRich(' in js
+    assert 'function readableEmphasisParagraphs(' in js
+    assert 'function readingCard(' in js
+    assert 'class="candidate-insight-grid"' in js
+    assert "readingCard('잘 맞는 이유'" in js
+    assert "readingCard('먼저 조율할 부분'" in js
+    assert "readingCard('역할을 나누는 방법'" in js
+    assert "readingCard('현실에서 확인할 점'" in js
+    assert 'class="pair-overview-copy">${readableEmphasisParagraphs' in js
+    assert '.reading-highlight,strong.reading-highlight{display:inline!important;margin:0!important;color:#a84f70' in css
+    assert '.candidate-insight-grid{display:grid;grid-template-columns:repeat(3' in css
+    candidate_card = js[js.index('function candidateCard('):js.index('function renderAuto(')]
+    assert "'연인 궁합':'친구 궁합'" not in candidate_card
+    assert 'mood.icon' not in candidate_card
+    assert 'aria-label="${kind} 후보 ${rank' in candidate_card
+
+
+def test_loading_scene_and_report_brand_use_soft_pastels():
+    root = Path(__file__).resolve().parents[1]
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+
+    assert '.loading{background:rgba(83,68,77,.28)' in css
+    assert 'linear-gradient(155deg,#f7eef5 0%,#f2edf7 43%,#faeef1 72%,#faf4e8 100%)' in css
+    assert '.loading-progress-fill{background:linear-gradient(90deg,#c87998,#a890bc,#79a798)' in css
+    assert '.loading-rainbow{right:-3%;bottom:20%' in css
+    assert '.report-header .approved-bunny-logo{width:54px;height:54px' in css
+    assert 'clip-path:circle(49% at 50% 50%)' in css
+    assert "owner.endsWith('님')" in js
+    assert '`${owner}님의 사주 리포트`' in js
+
+
+def test_print_button_opens_complete_browser_pdf_layout():
+    root = Path(__file__).resolve().parents[1]
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+
+    assert 'function printReport()' in js
+    assert "closed=$$('details').filter(node=>!node.open)" in js
+    assert "$('#printButton').onclick=printReport" in js
+    assert 'window.print()' in js
+    assert '@page{size:auto;margin:12mm}' in css
+    assert '#workspace{display:block!important}' in css
+    assert '.page{display:block!important;break-before:page}' in css
+    assert 'print-color-adjust:exact' in css
 
 
 def test_loading_and_pair_score_are_information_dashboards():

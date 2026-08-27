@@ -89,3 +89,16 @@ def test_generated_daily_language_uses_natural_korean_particles(monkeypatch):
     assert '대화이' not in copy
     assert '있음 상황' not in copy
     assert '대화 방식이' in copy
+
+
+def test_special_star_without_position_is_presented_as_whole_chart_context(monkeypatch):
+    explain = _load_explain(monkeypatch)
+    facts = _facts(explain, name='위치표현', day_pillar='丁卯', stars=['심성'], positions={})
+
+    row = explain._star_rows(facts)[0]
+
+    assert row['name'] == '심성'
+    assert row['positions'] == []
+    assert '원국 전체 참고 항목' in row['personal_note']
+    assert '위치 미확인' not in row['personal_note']
+    assert '감수성' in row['meaning']
