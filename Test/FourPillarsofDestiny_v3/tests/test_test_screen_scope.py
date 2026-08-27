@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-13' in html
+    assert '20260827-rainbow-cloud-15' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -75,8 +75,8 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert 'class="ui-icon cta-bunny-icon"' in html
     assert 'width:36px;height:38px' in css
     assert '.bunny-cursor.is-interactive{opacity:0!important' in css
-    assert 'body:not(.intro-active) .bunny-cursor{display:none!important}' in css
-    assert 'select,summary,[role="button"],.option-card' in css
+    assert 'html,body{cursor:none!important}' in css
+    assert 'button,input,textarea,select,summary' in js
     assert '.bunny-cursor.is-boing .bunny-cursor-paw' in css
     assert '@keyframes cursorBoing' in css
     assert 'function initBunnyCursor()' in js
@@ -90,7 +90,16 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert 'width:min(100%,318px)' in css
     assert '.member-add-bunny::before,.member-add-bunny::after' in css
     assert 'background-position:right 17px center' in css
-    assert 'grid-template-columns:18px auto' in css
+    assert 'grid-template-columns:18px minmax(0,1fr) 18px' in css
+    assert '.member-remove-button{' in css
+    assert 'data-remove-member' in js
+    assert 'function bindMemberRemoval(' in js
+    assert "actionLabel:'되돌리기'" in js
+    assert "parent.insertBefore(card" in js
+    assert '.toast-action' in css
+    assert 'd.expected_seconds??d.estimated_seconds??d.seconds' in js
+    assert 'include_pair:f.elements.include_pair.checked' in js
+    assert 'group_members:groupExtra?groupExtra+1:0' in js
     assert 'mask-image:linear-gradient(90deg,transparent 0%' in css
     assert 'background:linear-gradient(105deg,#ef4f8e 0%,#f36f98 62%,#f69a88 100%)' in css
 

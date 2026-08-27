@@ -43,3 +43,22 @@ def test_live_profile_can_learn_runtime_metrics():
 def test_runtime_metric_namespace_resets_old_contaminated_history():
     from progress_tracker import _total_metric_key
     assert _total_metric_key('group', {'members': 15}).startswith('live_v2:')
+
+
+def test_initial_eta_expands_with_pair_and_group_scope():
+    from progress_tracker import estimate
+
+    base = estimate('initial', {
+        'birth_year': 2000,
+        'build_matches': False,
+        'include_pair': False,
+        'group_members': 0,
+    })['expected_seconds']['seconds']
+    expanded = estimate('initial', {
+        'birth_year': 2000,
+        'build_matches': False,
+        'include_pair': True,
+        'group_members': 5,
+    })['expected_seconds']['seconds']
+
+    assert expanded > base
