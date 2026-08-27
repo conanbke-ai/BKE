@@ -27,6 +27,8 @@ REQUIRED_FILES = [
     'static/assets/intro-splash.png',
     'static/assets/input-header-rainbow-v2.png',
     'static/assets/app-background-clouds-v2.png',
+    'static/assets/paw-cursor.svg',
+    'static/assets/carrot-cursor.svg',
     'static/assets/loading-bunny-hop.webp',
     'static/assets/loading-bunny-hop-fallback.png',
     'audit_contracts.py',

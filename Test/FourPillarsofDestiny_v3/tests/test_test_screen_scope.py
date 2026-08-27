@@ -58,16 +58,20 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-05' in html
+    assert '20260827-rainbow-cloud-06' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
     assert "url('/static/assets/app-background-clouds-v2.png')" in css
     assert '.compact-submit{display:grid;width:min(100%,326px)' in css
-    assert '.input-header-static-image{position:absolute;right:0;top:0;width:auto;height:100%' in css
+    assert '.input-header-static-image{position:absolute;right:-4px;top:-6%;width:auto;height:112%' in css
     assert '.intro-mobile-copy{display:block' in css
     assert '.compact-submit{width:min(100%,306px)' in css
     assert '.compact-submit::after{content:"→"' in css
+    assert "cursor:url('/static/assets/paw-cursor.svg')" in css
+    assert "cursor:url('/static/assets/carrot-cursor.svg')" in css
+    assert 'mask-image:linear-gradient(90deg,transparent 0%' in css
+    assert 'background:linear-gradient(105deg,#ef4f8e 0%,#f36f98 62%,#f69a88 100%)' in css
 
 
 def test_profile_dashboard_separates_plain_language_from_special_star_evidence():
