@@ -121,7 +121,7 @@ body{
   .toe-one{left:1px;top:9px;transform:rotate(-30deg)}.toe-two{left:9px;top:1px;transform:rotate(-12deg)}.toe-three{right:8px;top:1px;transform:rotate(12deg)}.toe-four{right:0;top:10px;transform:rotate(30deg)}
   .paw-pad{left:7px;top:15px;width:22px;height:19px;border-radius:52% 52% 46% 46%;background:linear-gradient(145deg,#ff8fb6,#ed5793)}
   .paw-pad span{display:grid;height:100%;place-items:center;color:#ffdbe8;font-size:9px;font-style:normal;transform:rotate(8deg)}
-  .bunny-cursor.is-interactive{opacity:0!important;filter:none}
+  .bunny-cursor.is-interactive{opacity:1!important;filter:drop-shadow(0 4px 7px rgba(203,65,123,.28))}
   .bunny-cursor.is-interactive .paw-toe{background:linear-gradient(145deg,#ffc1ca,#ff8c9e)}
   .bunny-cursor.is-interactive .paw-pad{background:linear-gradient(145deg,#ff9f9a,#f16692)}
   .bunny-cursor-pop{position:absolute;left:27px;top:-5px;padding:1px 5px;border:1px solid #ffd0df;border-radius:999px;color:#d94783;background:rgba(255,255,255,.96);font-size:8px;font-weight:950;white-space:nowrap;opacity:0;transform:translateY(5px) scale(.7)}

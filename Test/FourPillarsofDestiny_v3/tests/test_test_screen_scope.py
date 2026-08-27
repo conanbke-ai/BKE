@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-20' in html
+    assert '20260827-rainbow-cloud-21' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -74,7 +74,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert 'compact-submit-label' in html
     assert 'class="ui-icon cta-bunny-icon"' in html
     assert 'width:36px;height:38px' in css
-    assert '.bunny-cursor.is-interactive{opacity:0!important' in css
+    assert '.bunny-cursor.is-interactive{opacity:1!important' in css
     assert 'html,body{cursor:none!important}' in css
     assert 'button,input,textarea,select,summary' in js
     assert '.bunny-cursor.is-boing .bunny-cursor-paw' in css
