@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-09' in html
+    assert '20260827-rainbow-cloud-13' in html
     assert 'cute rainbow-pink visual system and responsive control alignment' in css
     assert '--violet:#e65b99' in css
     assert 'assets/input-header-rainbow-v2.png' in html
@@ -70,16 +70,27 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert '.compact-submit{width:min(100%,306px)' in css
     assert '.compact-submit::after{content:"→"' in css
     assert 'id="bunnyCursor" class="bunny-cursor"' in html
+    assert 'cta-bunny-charm' in html
+    assert 'compact-submit-label' in html
     assert 'class="ui-icon cta-bunny-icon"' in html
+    assert 'width:36px;height:38px' in css
+    assert '.bunny-cursor.is-interactive{opacity:0!important' in css
+    assert 'body:not(.intro-active) .bunny-cursor{display:none!important}' in css
+    assert 'select,summary,[role="button"],.option-card' in css
     assert '.bunny-cursor.is-boing .bunny-cursor-paw' in css
     assert '@keyframes cursorBoing' in css
     assert 'function initBunnyCursor()' in js
+    assert 'document.elementFromPoint(lastX,lastY)' in js
+    assert "label=$('.compact-submit-label',button)" in js
     assert 'initBunnyCursor();bindBirthPickers()' in js
     assert 'function memberAddButton(attribute)' in js
     assert 'class="ghost-button member-add-button"' in js
     assert '새 사람의 출생정보를 입력해요' in js
     assert '.member-add-row{display:flex;margin:24px 0 8px;padding-top:20px' in css
+    assert 'width:min(100%,318px)' in css
     assert '.member-add-bunny::before,.member-add-bunny::after' in css
+    assert 'background-position:right 17px center' in css
+    assert 'grid-template-columns:18px auto' in css
     assert 'mask-image:linear-gradient(90deg,transparent 0%' in css
     assert 'background:linear-gradient(105deg,#ef4f8e 0%,#f36f98 62%,#f69a88 100%)' in css
 
