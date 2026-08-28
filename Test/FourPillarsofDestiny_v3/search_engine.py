@@ -223,11 +223,17 @@ def _source_status(facts: ForcetellerFacts) -> dict:
     source_backed = str(facts.source).startswith('forceteller')
     verified = facts.source_quality >= SETTINGS.min_verified_source_quality and source_backed
     label = (
-        '세부 원국 자료 확인 완료'
+        '세부 자료까지 확인'
         if verified else
-        ('저장된 원국 자료 사용 · 일부 세부 항목은 보수 계산' if source_backed else '기본 원국 계산 기준 · 세부 원국 확인 전 예비 후보')
+        ('원국 계산 완료 · 일부 보조 항목은 확인 범위만 반영' if source_backed else '원국 계산 완료 · 외부 보조자료 미확인')
     )
-    return {'verified': verified, 'source_backed': source_backed, 'label': label, 'quality': facts.source_quality}
+    return {
+        'verified': verified,
+        'source_backed': source_backed,
+        'level': 'verified' if verified else 'calculated',
+        'label': label,
+        'quality': facts.source_quality,
+    }
 
 
 def _age_meta(profile: BirthProfile) -> dict:
@@ -383,7 +389,7 @@ def search_auto_matches(
             'older_years': older,
             'younger_years': younger,
             'shortlist_per_year': SETTINGS.auto_shortlist_per_year,
-            'rule': '모든 날짜·12시진을 로컬 구조로 비교하고 출생연도별 1명만 남깁니다. 세부 원국 확인 후보를 우선하며, 확인 실패로 순위가 부족하면 로컬 원국 기반 예비 후보로 TOP 10을 채웁니다.',
+            'rule': '모든 날짜·12시진을 로컬 구조로 비교하고 출생연도별 1명만 남깁니다. 외부 세부자료까지 확인된 후보를 우선하며, 나머지는 계산이 완료된 원국에서 확인 가능한 항목만 반영해 TOP 10을 채웁니다.',
         },
         'evaluated_local_birth_datetimes': evaluated,
         'collected_unique_profiles': len(collected),

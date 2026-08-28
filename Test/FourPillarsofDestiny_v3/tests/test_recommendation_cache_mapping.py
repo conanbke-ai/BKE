@@ -24,6 +24,7 @@ from search_engine import (
     _facts_complete,
     _facts_ranking_reproducible,
     _facts_recommendation_usable,
+    _source_status,
     _auto_cache_usable,
     _ranked_sources_reusable,
     ideal_from_auto,
@@ -141,6 +142,22 @@ def test_local_facts_fill_missing_years_as_reproducible_provisional_candidates()
     winners = _best_exact_per_year(user, [local], 'love')
     assert len(winners) == 1
     assert winners[0].profile.name == '예비후보'
+
+
+def test_local_candidate_status_says_chart_calculation_is_complete():
+    from dataclasses import replace
+
+    local = replace(
+        cached_source_facts(person('계산후보', 1996, 8, 8, 'M', 13, 0), '甲子'),
+        source='local_fallback',
+        source_quality=35,
+    )
+    status = _source_status(local)
+
+    assert status['verified'] is False
+    assert status['level'] == 'calculated'
+    assert status['label'].startswith('원국 계산 완료')
+    assert '예비' not in status['label']
 
 
 def test_candidate_key_is_carried_through_ideal_and_pair_report_mapping():

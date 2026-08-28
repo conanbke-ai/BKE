@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260828-rainbow-cloud-37' in html
+    assert '20260828-rainbow-cloud-41' in html
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -277,6 +277,8 @@ def test_pair_and_top10_use_calm_structured_emphasis_cards():
     css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
 
     assert 'function emphasisRich(' in js
+    assert 'function autoHighlightRich(' in js
+    assert 'if(selected.length>=limit)break' in js
     assert 'function readableEmphasisParagraphs(' in js
     assert 'function readingCard(' in js
     assert 'class="candidate-insight-grid"' in js
@@ -285,6 +287,15 @@ def test_pair_and_top10_use_calm_structured_emphasis_cards():
     assert "readingCard('역할을 나누는 방법'" in js
     assert "readingCard('현실에서 확인할 점'" in js
     assert 'class="pair-overview-copy">${readableEmphasisParagraphs' in js
+    assert 'function sourceState(' in js
+    assert "label:'원국 계산 완료'" in js
+    assert 'function recommendationSourceSummary(' in js
+    assert "title=key==='personality'?`${honorificName(subjectName)}의 기본 성향`" in js
+    assert 'plainLifeText(value,{subject=' in js
+    assert 'subject:targetName' in js
+    assert 'function relationshipStyleCard(' in js
+    assert "readingCard('강점이 드러나는 점수 축'" in js
+    assert "readingCard('조율이 필요한 점수 축'" in js
     assert '.reading-highlight,strong.reading-highlight{display:inline!important;margin:0!important;color:#a84f70' in css
     assert '.candidate-insight-grid{display:grid;grid-template-columns:repeat(3' in css
     candidate_card = js[js.index('function candidateCard('):js.index('function renderAuto(')]
