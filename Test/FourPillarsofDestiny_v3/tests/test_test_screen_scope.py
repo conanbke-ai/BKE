@@ -1,5 +1,20 @@
 from app import app
 from pathlib import Path
+import re
+
+
+def _effective_css_property(css: str, selector: str, property_name: str) -> str | None:
+    """Return the last source-order declaration for a simple selector."""
+    source = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+    value = None
+    for selector_group, body in re.findall(r'([^{}]+)\{([^{}]*)\}', source):
+        if selector not in {item.strip() for item in selector_group.split(',')}:
+            continue
+        for declaration in body.split(';'):
+            name, separator, current = declaration.partition(':')
+            if separator and name.strip() == property_name:
+                value = current.strip()
+    return value
 
 
 def test_regular_screen_never_exposes_local_test_fixture():
@@ -59,7 +74,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260828-rainbow-cloud-44' in html
+    assert html.count('20260828-rainbow-cloud-46') == 9
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -355,10 +370,26 @@ def test_loading_scene_and_report_brand_use_soft_pastels():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
     css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
 
-    assert '.loading{background:rgba(83,68,77,.28)' in css
-    assert 'linear-gradient(155deg,#f7eef5 0%,#f2edf7 43%,#faeef1 72%,#faf4e8 100%)' in css
-    assert '.loading-progress-fill{background:linear-gradient(90deg,#cf7092 0%,#e59b91 52%,#91b8aa 100%)' in css
-    assert '.loading-rainbow{right:-3%;bottom:20%' in css
+    assert '/* bright, gentle rainbow loading scene */' in css
+    assert _effective_css_property(css, '.loading', 'background') == (
+        'radial-gradient(circle at 15% 12%,rgba(255,255,255,.78),transparent 34%),'
+        'radial-gradient(circle at 86% 82%,rgba(218,247,237,.64),transparent 36%),'
+        'linear-gradient(140deg,rgba(255,218,234,.86),rgba(246,228,255,.8) 48%,rgba(229,246,242,.8))'
+    )
+    assert _effective_css_property(css, '.loading-sky', 'background') == (
+        'radial-gradient(circle at 76% 20%,rgba(255,255,255,.94) 0 6%,transparent 21%),'
+        'linear-gradient(145deg,#ffcce1 0%,#edd8fb 30%,#d9ebfb 54%,#d9f2e8 75%,#ffebc1 100%)'
+    )
+    assert _effective_css_property(css, '.loading-progress-track', 'background') == '#fae4ee'
+    assert _effective_css_property(css, '.loading-progress-fill', 'background') == (
+        'linear-gradient(90deg,#eb679d 0%,#f28ba6 34%,#f3b77f 57%,#86cab2 79%,#89b4de 100%)'
+    )
+    assert _effective_css_property(css, '.loading-rainbow', 'opacity') == '.92'
+    assert _effective_css_property(css, '.loading-rainbow', 'filter') == 'none'
+    assert _effective_css_property(css, '.loading-aurora', 'opacity') == '.24'
+    assert _effective_css_property(css, '.loading-step.active .loading-step-index', 'background') == (
+        'linear-gradient(135deg,#eb5f99,#f28e9c)'
+    )
     assert '.report-header .approved-bunny-logo{width:54px;height:54px' in css
     assert 'clip-path:circle(49% at 50% 50%)' in css
     assert 'possessiveName(owner)' in js
