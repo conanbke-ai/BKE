@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-36' in html
+    assert '20260828-rainbow-cloud-37' in html
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -151,6 +151,11 @@ def test_report_readability_redesign_keeps_cute_icons_and_structured_content():
     assert 'function activeDaewoonIndex(' in js
     assert 'class="daewoon-period-button' in js
     assert 'function periodPillarVisual(' in js
+    assert '<div><h3>${label}</h3><small>' in js
+    assert 'const honorificName=' in js
+    assert 'function applyReportNameHonorifics(' in js
+    assert "new RegExp(`${escaped}(?!님)`" in js
+    assert 'installHonorificObserver()' in js
     assert 'aria-current="true"' in js
     assert 'class="daewoon-selected-marker"' in js
     assert 'id="daewoonSelected"' in js
@@ -299,8 +304,8 @@ def test_loading_scene_and_report_brand_use_soft_pastels():
     assert '.loading-rainbow{right:-3%;bottom:20%' in css
     assert '.report-header .approved-bunny-logo{width:54px;height:54px' in css
     assert 'clip-path:circle(49% at 50% 50%)' in css
-    assert "owner.endsWith('님')" in js
-    assert '`${owner}님의 사주 리포트`' in js
+    assert 'possessiveName(owner)' in js
+    assert '`${possessiveName(owner)} 사주 리포트`' in js
 
 
 def test_print_button_opens_complete_browser_pdf_layout():
