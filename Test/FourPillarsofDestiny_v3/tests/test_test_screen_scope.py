@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260828-rainbow-cloud-42' in html
+    assert '20260828-rainbow-cloud-44' in html
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -145,7 +145,7 @@ def test_report_readability_redesign_keeps_cute_icons_and_structured_content():
     assert js.index("section('상대의 원국'") < js.index('class="hero-summary pair-hero card"')
     pair = js[js.index('function renderPair('):js.index('async function submitPair(')]
     assert pair.index("section('생활 속에서 미리 확인할 것'") < pair.index("section('상대의 신살·길성 참고'")
-    assert pair.index("section('상대의 신살·길성 참고'") < pair.index("section('점수 축과 해석 근거'")
+    assert pair.index("section('상대의 신살·길성 참고'") < pair.index("section('궁합 점수가 나온 이유'")
     assert 'strong.reading-highlight{display:inline!important' in css
     assert 'class="fortune-detail-groups"' in js
     assert 'function activeDaewoonIndex(' in js
@@ -300,14 +300,54 @@ def test_pair_and_top10_use_calm_structured_emphasis_cards():
     assert 'plainLifeText(value,{subject=' in js
     assert 'subject:targetName' in js
     assert 'function relationshipStyleCard(' in js
-    assert "readingCard('강점이 드러나는 점수 축'" in js
-    assert "readingCard('조율이 필요한 점수 축'" in js
+    assert "readingCard('함께 있을 때 편안한 점'" in js
+    assert "readingCard('가까워질수록 맞춰야 할 점'" in js
     assert '.reading-highlight,strong.reading-highlight{display:inline!important;margin:0!important;color:#a84f70' in css
     assert '.candidate-insight-grid{display:grid;grid-template-columns:repeat(3' in css
     candidate_card = js[js.index('function candidateCard('):js.index('function renderAuto(')]
     assert "'연인 궁합':'친구 궁합'" not in candidate_card
     assert 'mood.icon' not in candidate_card
     assert 'aria-label="${kind} 후보 ${rank' in candidate_card
+
+
+def test_pair_report_uses_distinct_life_scenes_and_hides_technical_terms_by_default():
+    root = Path(__file__).resolve().parents[1]
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+
+    pair = js[js.index('function renderPair('):js.index('async function submitPair(')]
+    relationship = js[js.index('function relationshipStyleCard('):js.index('function pairAxisStories(')]
+    axes = js[js.index('function axisCards('):js.index('const show=')]
+
+    assert '아래에서는 같은 설명을 반복하지 않고' not in js
+    assert 'a.technical_focus' not in pair
+    assert 'pairOverviewNarrative(r,a,axes,userName,targetName)' in pair
+    assert 'a.emotional_needs||a.each_needs' in pair
+    assert 'a.communication_daily||a.communication' in pair
+    assert 'a.physical_intimacy||a.intimacy' in pair
+    assert 'a.long_term_checklist||a.long_term' in pair
+    assert pair.count('a.conflict_repair') == 1
+
+    assert 'function relationshipDimension(' in js
+    assert 'romance_dimensions' in js
+    assert "title:'호감을 표현할 때'" in relationship
+    assert "title:'관계를 결정할 때'" in relationship
+    assert "title:'갈등이 생겼을 때'" in relationship
+    assert 'teaser(relationship)' not in relationship
+    assert 'class="relationship-scene-list"' in relationship
+    assert '.relationship-scene p{margin:0;color:#5f555a;font-size:14px' in css
+
+    for key in (
+        'element_need', 'spouse_palace', 'spouse_star', 'stem_daymaster',
+        'stem_communication', 'friend_ten_gods', 'branch_network',
+        'month_life', 'month_social', 'conflict_buffer',
+    ):
+        assert f'{key}:{{label:' in js
+    assert 'class="axis-life-tip"' in axes
+    assert '<details class="axis-technical-details">' in axes
+    assert '<details class="axis-technical-details" open' not in axes
+    assert axes.index('<details class="axis-technical-details">') < axes.index('axis.label||axis.key')
+    assert '.axis-life-tip{margin-top:12px' in css
 
 
 def test_loading_scene_and_report_brand_use_soft_pastels():
