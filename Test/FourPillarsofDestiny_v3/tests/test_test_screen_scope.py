@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260827-rainbow-cloud-35' in html
+    assert '20260827-rainbow-cloud-36' in html
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -150,11 +150,19 @@ def test_report_readability_redesign_keeps_cute_icons_and_structured_content():
     assert 'class="fortune-detail-groups"' in js
     assert 'function activeDaewoonIndex(' in js
     assert 'class="daewoon-period-button' in js
+    assert 'function periodPillarVisual(' in js
+    assert 'aria-current="true"' in js
+    assert 'class="daewoon-selected-marker"' in js
     assert 'id="daewoonSelected"' in js
     assert 'daewoonDetail(periods[currentIndex]||{},currentIndex,true)' in js
     assert '.daewoon-timeline{position:relative;display:flex' in css
     assert '.daewoon-selected-card' in css
-    assert 'class="daewoon-focus-row"' in js
+    assert '.period-character.water' in css
+    assert '.period-character.metal' in css
+    assert '.daewoon-period-button.active:not(.current)' in css
+    assert '.daewoon-period-button.current.active' in css
+    assert 'class="daewoon-overview"' in js
+    assert '10년의 흐름을 생활 언어로 보면' in js
     assert 'class="daewoon-selected-summary"' not in js
     assert '.fortune-detail-block li::before' in css
     assert 'function friendlyStarText(' in js
