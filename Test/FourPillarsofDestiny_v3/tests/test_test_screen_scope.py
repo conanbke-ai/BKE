@@ -74,7 +74,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert html.count('20260828-rainbow-cloud-46') == 9
+    assert html.count('20260828-rainbow-cloud-49') == 9
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -370,26 +370,29 @@ def test_loading_scene_and_report_brand_use_soft_pastels():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
     css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
 
-    assert '/* bright, gentle rainbow loading scene */' in css
+    assert '/* unified pink-cloud loading scene */' in css
     assert _effective_css_property(css, '.loading', 'background') == (
-        'radial-gradient(circle at 15% 12%,rgba(255,255,255,.78),transparent 34%),'
-        'radial-gradient(circle at 86% 82%,rgba(218,247,237,.64),transparent 36%),'
-        'linear-gradient(140deg,rgba(255,218,234,.86),rgba(246,228,255,.8) 48%,rgba(229,246,242,.8))'
+        "#fff1f7 url('/static/assets/app-background-clouds-v2.png') center/cover no-repeat"
     )
+    assert _effective_css_property(css, '.loading', 'backdrop-filter') == 'none'
     assert _effective_css_property(css, '.loading-sky', 'background') == (
-        'radial-gradient(circle at 76% 20%,rgba(255,255,255,.94) 0 6%,transparent 21%),'
-        'linear-gradient(145deg,#ffcce1 0%,#edd8fb 30%,#d9ebfb 54%,#d9f2e8 75%,#ffebc1 100%)'
+        'radial-gradient(circle at 50% 46%,rgba(255,255,255,.82) 0 18%,'
+        'rgba(255,255,255,0) 54%),linear-gradient(145deg,rgba(255,209,230,.68),'
+        'rgba(240,222,249,.62) 52%,rgba(255,230,239,.58))'
     )
     assert _effective_css_property(css, '.loading-progress-track', 'background') == '#fae4ee'
     assert _effective_css_property(css, '.loading-progress-fill', 'background') == (
         'linear-gradient(90deg,#eb679d 0%,#f28ba6 34%,#f3b77f 57%,#86cab2 79%,#89b4de 100%)'
     )
-    assert _effective_css_property(css, '.loading-rainbow', 'opacity') == '.92'
-    assert _effective_css_property(css, '.loading-rainbow', 'filter') == 'none'
-    assert _effective_css_property(css, '.loading-aurora', 'opacity') == '.24'
+    assert _effective_css_property(css, '.loading-rainbow', 'display') == 'none'
+    assert _effective_css_property(css, '.loading-aurora', 'display') == 'none'
+    assert _effective_css_property(css, '.loading-cloud', 'display') == 'none'
     assert _effective_css_property(css, '.loading-step.active .loading-step-index', 'background') == (
         'linear-gradient(135deg,#eb5f99,#f28e9c)'
     )
+    assert 'const MINIMUM_LOADING_MS=650;' in js
+    assert 'const remaining=MINIMUM_LOADING_MS-(Date.now()-state.startedAt)' in js
+    assert 'if(remaining>0)await new Promise(resolve=>setTimeout(resolve,remaining))' in js
     assert '.report-header .approved-bunny-logo{width:54px;height:54px' in css
     assert 'clip-path:circle(49% at 50% 50%)' in css
     assert 'possessiveName(owner)' in js
