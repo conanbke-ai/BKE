@@ -59,7 +59,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert '20260828-rainbow-cloud-41' in html
+    assert '20260828-rainbow-cloud-42' in html
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -85,7 +85,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     assert 'function initBunnyCursor()' in js
     assert 'document.elementFromPoint(lastX,lastY)' in js
     assert "label=$('.compact-submit-label',button)" in js
-    assert 'initBunnyCursor();bindBirthPickers()' in js
+    assert 'initBunnyCursor();initScrollTopButton();bindBirthPickers()' in js
     assert 'function memberAddButton(attribute)' in js
     assert 'class="ghost-button member-add-button"' in js
     assert '새 사람의 출생정보를 입력해요' in js
@@ -249,6 +249,12 @@ def test_group_dashboard_reads_member_facts_and_visualizes_scores_by_tone():
     assert '편안한 연결 3개' in js
     assert '조율할 연결 2개' in js
     assert 'aria-label="${esc(point.name)}님의 대표 관계 확인"' in js
+    assert "toolbar.className='group-map-toolbar'" in js
+    assert 'data-group-reset hidden' in js
+    assert 'let pendingPerson=null' in js
+    assert 'pendingPerson!==null&&pendingPerson!==index' in js
+    assert 'resetButton?.addEventListener(\'click\',resetView)' in js
+    assert '.group-map-toolbar{display:flex' in css
     assert '관계 묶음' not in js
     assert 'function matrixTone(score)' in js
     assert 'matrix-score ${matrixTone(score)}' in js
@@ -311,12 +317,30 @@ def test_loading_scene_and_report_brand_use_soft_pastels():
 
     assert '.loading{background:rgba(83,68,77,.28)' in css
     assert 'linear-gradient(155deg,#f7eef5 0%,#f2edf7 43%,#faeef1 72%,#faf4e8 100%)' in css
-    assert '.loading-progress-fill{background:linear-gradient(90deg,#c87998,#a890bc,#79a798)' in css
+    assert '.loading-progress-fill{background:linear-gradient(90deg,#cf7092 0%,#e59b91 52%,#91b8aa 100%)' in css
     assert '.loading-rainbow{right:-3%;bottom:20%' in css
     assert '.report-header .approved-bunny-logo{width:54px;height:54px' in css
     assert 'clip-path:circle(49% at 50% 50%)' in css
     assert 'possessiveName(owner)' in js
     assert '`${possessiveName(owner)} 사주 리포트`' in js
+
+
+def test_fortune_cards_share_reading_lines_and_pages_offer_scroll_top():
+    root = Path(__file__).resolve().parents[1]
+    html = (root / 'templates' / 'index.html').read_text(encoding='utf-8')
+    css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+    js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
+
+    assert '.fortune-grid{gap:16px}' in css
+    assert '.fortune-card-head{min-height:78px;align-items:flex-start}' in css
+    assert '.fortune-card-title small{min-height:44px' in css
+    assert '.fortune-card details>summary{display:grid;min-height:64px' in css
+    assert '.period-character.fire{--element:#bf5f76;--element-soft:#fff1f5}' in css
+    assert '.period-character.earth{--element:#a5793d;--element-soft:#fff8e7}' in css
+    assert 'id="scrollTopButton" class="scroll-top-button"' in html
+    assert 'function initScrollTopButton()' in js
+    assert 'window.scrollY>520' in js
+    assert 'initBunnyCursor();initScrollTopButton();bindBirthPickers()' in js
 
 
 def test_print_button_opens_complete_browser_pdf_layout():
