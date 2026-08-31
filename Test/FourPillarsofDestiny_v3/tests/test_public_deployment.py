@@ -126,7 +126,10 @@ secure_origin = {'Origin': 'https://saju.example'}
 
 with app.test_request_context(
     '/',
-    headers={'X-Forwarded-For': '203.0.113.25, 10.0.0.4'},
+    headers={
+        'CF-Connecting-IP': '203.0.113.25',
+        'X-Forwarded-For': '198.51.100.99, 10.0.0.4',
+    },
     environ_base={'REMOTE_ADDR': '10.0.0.5'},
 ):
     assert _client_identity() == '203.0.113.25'

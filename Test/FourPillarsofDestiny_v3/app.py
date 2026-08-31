@@ -121,9 +121,9 @@ def _same_origin() -> bool:
 
 
 def _client_identity() -> str:
-    """Use Render's first X-Forwarded-For value, falling back to the socket peer."""
+    """Use Render Cloudflare's overwrite-only client IP header when available."""
     if SETTINGS.public_deployment:
-        candidate = str(request.headers.get('X-Forwarded-For') or '').split(',', 1)[0].strip()
+        candidate = str(request.headers.get('CF-Connecting-IP') or '').strip()
         try:
             if candidate:
                 return str(ip_address(candidate))
