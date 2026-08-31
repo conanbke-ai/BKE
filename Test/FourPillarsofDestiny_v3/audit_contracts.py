@@ -72,7 +72,7 @@ for element_id in ['loading', 'loadingStage', 'loadingPercent', 'loadingProgress
     check(f'loading mapping: {element_id}', f'id="{element_id}"' in HTML and f'#{element_id}' in JS)
 
 check('loading image exists', (ROOT / 'static/assets/loading-bunny-hop.webp').is_file())
-check('loading motion exists', '@keyframes loadingFrame' in CSS and '.loading-bunny-sprite' in CSS)
+check('loading motion exists', '@keyframes loadingBunnyHop' in CSS and '@keyframes loadingBunnyShadow' in CSS and '.loading-bunny-sprite' in CSS)
 check('responsive layout exists', '@media(max-width:620px)' in CSS)
 check('reduced motion fallback exists', 'prefers-reduced-motion:reduce' in CSS)
 check('keyboard group exploration exists', "addEventListener('keydown'" in JS)

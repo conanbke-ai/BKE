@@ -107,8 +107,10 @@ def main() -> int:
             fail(errors, '첫 화면에 분리 렌더링하던 구형 hero 토끼 DOM이 다시 포함되어 있습니다.')
         if 'assets/input-header-rainbow-v2.png' not in template or 'input-header-static-image' not in template:
             fail(errors, '입력 화면의 정지형 토끼·무지개 헤더 아트가 누락되어 있습니다.')
-        if 'assets/loading-bunny-hop.webp' not in template or 'loading-bunny-sprite' not in template:
-            fail(errors, '로딩 전용 깡총 토끼 애니메이션 장면이 누락되어 있습니다.')
+        if 'assets/loading-bunny-hop-fallback.png' not in template or 'loading-bunny-sprite' not in template:
+            fail(errors, '로딩 전용 전체 토끼 이미지와 모션 장면이 누락되어 있습니다.')
+        if 'assets/loading-bunny-hop.webp' in template:
+            fail(errors, '프레임 잘림이 있던 구형 WebP 로딩 토끼가 다시 연결되어 있습니다.')
         if '확실히 아는 정보만 입력해도 됩니다.' in template:
             fail(errors, '삭제 요청된 내 출생정보 보조 문구가 다시 포함되어 있습니다.')
 
@@ -166,7 +168,7 @@ def main() -> int:
             fail(errors, '폐기한 손그림 토끼 CSS가 다시 포함되어 있습니다.')
         if '--text-control:' not in css or 'button{touch-action:manipulation;font-size:var(--text-control)}' not in css:
             fail(errors, '공통 버튼 글자 크기 토큰/기준이 누락되어 있습니다.')
-        for required in ('--rainbow-soft:', '.candy-launcher{', '.loading-sky{', '@keyframes loadingFrame'):
+        for required in ('--rainbow-soft:', '.candy-launcher{', '.loading-sky{', '@keyframes loadingBunnyHop', '@keyframes loadingBunnyShadow'):
             if required not in css:
                 fail(errors, f'핑크+무지개/로딩 UI 스타일 계약 누락: {required}')
         for selector in ('.birth-picker-open{', '.time-choice-button{'):

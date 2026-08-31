@@ -74,7 +74,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert html.count('20260828-rainbow-cloud-49') == 9
+    assert html.count('20260829-rainbow-cloud-52') == 7
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -263,7 +263,13 @@ def test_group_dashboard_reads_member_facts_and_visualizes_scores_by_tone():
     assert '선이 없어도 관계가 없는 것은 아니에요' in js
     assert '편안한 연결 3개' in js
     assert '조율할 연결 2개' in js
-    assert 'aria-label="${esc(point.name)}님의 대표 관계 확인"' in js
+    assert 'function dayMasterLabel(' in js
+    assert 'STEM_READING[stem]' in js
+    assert 'STEM_ELEMENT[stem]' in js
+    assert '<em>${esc(masterLabel)}</em>' in js
+    assert '${masterLabel} 일간, ${pillar} 일주' in js
+    assert '정화·병화처럼 적힌 말은 각 사람의 일간 이름과 오행이에요.' in js
+    assert '.group-network-map .group-node>em{display:block' in css
     assert "toolbar.className='group-map-toolbar'" in js
     assert 'data-group-reset hidden' in js
     assert 'let pendingPerson=null' in js
@@ -288,6 +294,10 @@ def test_profile_starts_with_visual_natal_chart_before_plain_summary():
     assert 'class="pillar-part ${position} ${visual.tone}"' in js
     assert '.top-natal-dashboard' in css
     assert '.text-only-profile-hero{min-height:0;grid-template-columns:minmax(0,1fr)' in css
+    assert "function readableEmphasisParagraphs(value,{plain=false,chunk=2,subject='나',limit=2}" in js
+    assert 'readableEmphasisParagraphs(overviewText,{plain:true,chunk:2,limit:1})' in profile
+    assert '.text-only-profile-hero .profile-hero-copy h2 span{color:#a55f78}' in css
+    assert '.text-only-profile-hero .profile-summary-copy strong{color:#9b536c' in css
     assert 'function groupedRoleCards(roles=[]' in js
     assert '같은 역할은 한 번만 설명하고' in js
 
@@ -307,6 +317,9 @@ def test_pair_and_top10_use_calm_structured_emphasis_cards():
     assert "readingCard('먼저 조율할 부분'" in js
     assert "readingCard('역할을 나누는 방법'" in js
     assert "readingCard('현실에서 확인할 점'" in js
+    assert 'return `**${meta.label} · ${score}점**\\n${copy} ${meta.action}`' in js
+    assert '.pair-axis-stories .reading-card li{white-space:pre-line}' in css
+    assert '.pair-axis-stories .reading-card li>.reading-highlight{display:block!important' in css
     assert 'class="pair-overview-copy">${readableEmphasisParagraphs' in js
     assert 'function sourceState(' in js
     assert "label:'원국 계산 완료'" in js
@@ -369,17 +382,24 @@ def test_loading_scene_and_report_brand_use_soft_pastels():
     root = Path(__file__).resolve().parents[1]
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
     css = (root / 'static' / 'styles.css').read_text(encoding='utf-8')
+    html = (root / 'templates' / 'index.html').read_text(encoding='utf-8')
 
     assert '/* unified pink-cloud loading scene */' in css
     assert _effective_css_property(css, '.loading', 'background') == (
-        "#fff1f7 url('/static/assets/app-background-clouds-v2.png') center/cover no-repeat"
+        "linear-gradient(180deg,rgba(255,249,252,.18),rgba(255,238,247,.28)),"
+        "url('/static/assets/app-background-clouds-v2.png') center/cover no-repeat"
     )
     assert _effective_css_property(css, '.loading', 'backdrop-filter') == 'none'
-    assert _effective_css_property(css, '.loading-sky', 'background') == (
-        'radial-gradient(circle at 50% 46%,rgba(255,255,255,.82) 0 18%,'
-        'rgba(255,255,255,0) 54%),linear-gradient(145deg,rgba(255,209,230,.68),'
-        'rgba(240,222,249,.62) 52%,rgba(255,230,239,.58))'
-    )
+    assert _effective_css_property(css, '.loading-sky', 'background') == 'transparent'
+    assert '.loading-bunny-sprite{inset:14px 18px 18px;z-index:3;animation:loadingBunnyHop 1.85s cubic-bezier(.45,.04,.26,1) infinite' in css
+    assert '@media(prefers-reduced-motion:reduce){.loading-bunny-sprite,.loading-bunny-sprite::after{animation:none}' in css
+    assert _effective_css_property(css, '.loading-bunny-sprite img', 'transform') == 'none'
+    assert _effective_css_property(css, '.loading-sky::before', 'height') == '82px'
+    assert _effective_css_property(css, '.loading-sky::before', 'z-index') == '2'
+    assert '@keyframes loadingBunnyHop{' in css
+    assert '@keyframes loadingBunnyShadow{' in css
+    assert '<span class="loading-bunny-sprite" aria-hidden="true">' in html
+    assert 'loading-bunny-hop.webp' not in html
     assert _effective_css_property(css, '.loading-progress-track', 'background') == '#fae4ee'
     assert _effective_css_property(css, '.loading-progress-fill', 'background') == (
         'linear-gradient(90deg,#eb679d 0%,#f28ba6 34%,#f3b77f 57%,#86cab2 79%,#89b4de 100%)'
