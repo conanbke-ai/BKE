@@ -20,7 +20,7 @@ POSTER = ASSETS / "loading-bunny-short-loop-poster-v1.png"
 CELL_SIZE = 444
 OUTPUT_SIZE = (720, 240)
 FRAME_DURATIONS_MS = (280, 140, 140, 180, 140, 160, 220, 340)
-FRAME_LIFT = (0, 8, 24, 36, 26, 10, 0, 0)
+FRAME_LIFT = (0, 14, 30, 68, 48, 16, 0, 0)
 FRAME_X = (-4, 0, 5, 8, 5, 2, -2, -4)
 
 
@@ -89,7 +89,7 @@ def compose_frame(background: Image.Image, sprite: Image.Image, index: int) -> I
         Image.Resampling.LANCZOS,
     )
     center_x = OUTPUT_SIZE[0] // 2 + FRAME_X[index]
-    ground_y = 208 - FRAME_LIFT[index]
+    ground_y = 222 - FRAME_LIFT[index]
     left = center_x - sprite.width // 2
     top = ground_y - sprite.height
 
@@ -100,9 +100,9 @@ def compose_frame(background: Image.Image, sprite: Image.Image, index: int) -> I
     shadow_draw.ellipse(
         (
             center_x - shadow_width // 2,
-            204,
+            216,
             center_x + shadow_width // 2,
-            219,
+            229,
         ),
         fill=(137, 78, 108, shadow_alpha),
     )

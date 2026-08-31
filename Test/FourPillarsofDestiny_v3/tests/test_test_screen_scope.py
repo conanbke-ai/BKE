@@ -88,7 +88,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert html.count('20260831-loading-film-53') == 9
+    assert html.count('20260831-higher-hop-54') == 9
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -429,7 +429,10 @@ def test_loading_scene_and_report_brand_use_soft_pastels():
     assert _animated_webp_durations(animation_data) == [280, 140, 140, 180, 140, 160, 220, 340]
     assert poster.read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
     assert sprite_sheet.read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
-    assert (root / 'build_loading_animation.py').is_file()
+    builder = (root / 'build_loading_animation.py').read_text(encoding='utf-8')
+    assert 'FRAME_LIFT = (0, 14, 30, 68, 48, 16, 0, 0)' in builder
+    assert 'ground_y = 222 - FRAME_LIFT[index]' in builder
+    assert '            216,\n            center_x + shadow_width // 2,\n            229,' in builder
     assert _effective_css_property(css, '.loading-progress-track', 'background') == '#fae4ee'
     assert _effective_css_property(css, '.loading-progress-fill', 'background') == (
         'linear-gradient(90deg,#eb679d 0%,#f28ba6 34%,#f3b77f 57%,#86cab2 79%,#89b4de 100%)'
