@@ -6,9 +6,9 @@
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#fff2f7">
   <title>{{ app_name }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260831-higher-hop-54') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260831-public-deploy-56') }}">
 </head>
-<body class="intro-active" data-test-mode="{{ 'true' if test_mode else 'false' }}" data-test-fixture-available="{{ 'true' if test_fixture else 'false' }}" data-bunny-src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260831-higher-hop-54') }}">
+<body class="intro-active" data-test-mode="{{ 'true' if test_mode else 'false' }}" data-test-fixture-available="{{ 'true' if test_fixture else 'false' }}" data-bunny-src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260831-public-deploy-56') }}">
   <div class="cloud cloud-a" aria-hidden="true"></div>
   <div class="cloud cloud-b" aria-hidden="true"></div>
   <div id="bunnyCursor" class="bunny-cursor" aria-hidden="true">
@@ -26,7 +26,7 @@
           <div><span>토끼가 차근차근 풀어주는 사주 노트</span><strong>나의 사주 리포트</strong><p>내 사주와 운세부터 궁합까지 한 번에 살펴봐요.</p></div>
           <span class="intro-fallback-bunny">🐰</span>
         </div>
-        <img class="intro-splash-image" src="{{ url_for('static', filename='assets/intro-splash.png', v='20260831-higher-hop-54') }}" alt="토끼가 차근차근 풀어주는 나의 사주 리포트 시작 화면" onerror="this.classList.add('asset-failed')">
+        <img class="intro-splash-image" src="{{ url_for('static', filename='assets/intro-splash.png', v='20260831-public-deploy-56') }}" alt="토끼가 차근차근 풀어주는 나의 사주 리포트 시작 화면" onerror="this.classList.add('asset-failed')">
         <div class="intro-mobile-copy">
           <span>RAINBOW SAJU NOTE ✦</span>
           <strong>나의 사주<br>리포트</strong>
@@ -45,7 +45,7 @@
     <section id="onboarding" class="onboarding input-screen card bunny-surface hidden">
       <header class="input-screen-head">
         <div class="input-header-art" aria-hidden="true">
-          <img class="input-header-static-image" src="{{ url_for('static', filename='assets/input-header-rainbow-v2.png', v='20260831-higher-hop-54') }}" alt="">
+          <img class="input-header-static-image" src="{{ url_for('static', filename='assets/input-header-rainbow-v2.png', v='20260831-public-deploy-56') }}" alt="">
         </div>
         <button id="inputBackButton" class="input-back-button" type="button" aria-label="시작 화면으로 돌아가기">
           <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7M9 12h10"/></svg>
@@ -160,7 +160,11 @@
             <div><strong id="analysisOptionsTitle">이번에 같이 볼 것</strong><small>필요한 분석만 골라 한 번에 구성할 수 있어요.</small></div>
           </div>
           <div class="option-cards">
+            {% if public_deployment %}
+            <label class="option-card option-card-disabled" aria-disabled="true"><input name="build_matches" type="checkbox" disabled><span class="option-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 9.2c0 5-8.5 10.2-8.5 10.2S3.5 14.2 3.5 9.2A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.5 1.2Z"/></svg></span><span><strong>잘 맞는 사람 찾기</strong><small>TOP 10은 공개 체험판에서 준비 중이에요</small></span></label>
+            {% else %}
             <label class="option-card selected"><input name="build_matches" type="checkbox" checked><span class="option-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 9.2c0 5-8.5 10.2-8.5 10.2S3.5 14.2 3.5 9.2A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.5 1.2Z"/></svg></span><span><strong>잘 맞는 사람 찾기</strong><small>연인·친구 TOP 10과 최적 출생일시</small></span></label>
+            {% endif %}
             <label class="option-card"><input name="include_pair" type="checkbox"><span class="option-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3.5 19c.4-3.2 2-5 4.5-5s4.1 1.8 4.5 5M11.5 19c.4-3.2 2-5 4.5-5s4.1 1.8 4.5 5"/></svg></span><span><strong>1:1 궁합 함께</strong><small>궁금한 한 사람을 첫 리포트에 포함</small></span></label>
             <label class="option-card"><input name="include_group" type="checkbox"><span class="option-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="2.5"/><circle cx="6" cy="10" r="2"/><circle cx="18" cy="10" r="2"/><path d="M8 19c.3-3.2 1.6-5 4-5s3.7 1.8 4 5M2.8 18c.2-2.5 1.3-4 3.2-4M21.2 18c-.2-2.5-1.3-4-3.2-4"/></svg></span><span><strong>그룹 궁합 함께</strong><small>친구·직장·가족 등 여러 사람의 관계 구조</small></span></label>
           </div>
@@ -175,6 +179,12 @@
           <div id="initialPairFields" class="option-extra hidden"></div>
           <div id="initialGroupFields" class="option-extra hidden"></div>
         </div>
+        {% if public_deployment %}
+        <aside class="public-privacy-note" role="note" aria-label="공개 체험 버전 개인정보 안내">
+          <strong>입력 정보는 이번 리포트 계산에만 사용해요</strong>
+          <span>공개 체험 버전에서는 이름과 생년월일시를 서버 파일에 저장하거나 외부 AI·원국 서비스로 전송하지 않습니다.</span>
+        </aside>
+        {% endif %}
         <button id="createReportButton" class="primary-button bunny-button compact-submit" type="submit"><span class="compact-bunny-charm cta-bunny-charm" aria-hidden="true"><svg class="ui-icon cta-bunny-icon" viewBox="0 0 32 32"><ellipse class="bunny-fur" cx="10.8" cy="8.5" rx="3.4" ry="7" transform="rotate(-12 10.8 8.5)"/><ellipse class="bunny-fur" cx="21.2" cy="8.5" rx="3.4" ry="7" transform="rotate(12 21.2 8.5)"/><ellipse class="bunny-ear" cx="10.8" cy="8.5" rx="1.35" ry="4.3" transform="rotate(-12 10.8 8.5)"/><ellipse class="bunny-ear" cx="21.2" cy="8.5" rx="1.35" ry="4.3" transform="rotate(12 21.2 8.5)"/><circle class="bunny-fur" cx="16" cy="20" r="9.3"/><circle class="bunny-eye" cx="12.5" cy="19" r="1.35"/><circle class="bunny-eye" cx="19.5" cy="19" r="1.35"/><circle class="bunny-cheek" cx="10.1" cy="22" r="1.45"/><circle class="bunny-cheek" cx="21.9" cy="22" r="1.45"/><path class="bunny-mouth" d="M14.2 22.1c.9.8 1.8.8 1.8.8s.9 0 1.8-.8M16 21v2"/></svg></span><span class="compact-submit-label">리포트 시작하기</span></button>
       </form>
       <p class="micro">사주명리는 전통 해석 체계이며 과학적으로 검증된 미래 예측이나 관계 성공 확률이 아닙니다.</p>
@@ -182,7 +192,7 @@
 
     <section id="workspace" class="workspace hidden">
       <header class="report-header card rainbow-topbar">
-        <div class="topbar-brand compact-brand"><div class="approved-bunny-logo" aria-hidden="true"><img src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260831-higher-hop-54') }}" alt=""></div><div><span class="workspace-mini-kicker">MY SAJU NOTE ✦</span><h1 id="workspaceTitle">나의 사주 리포트</h1></div></div>
+        <div class="topbar-brand compact-brand"><div class="approved-bunny-logo" aria-hidden="true"><img src="{{ url_for('static', filename='assets/report-bunny-badge.png', v='20260831-public-deploy-56') }}" alt=""></div><div><span class="workspace-mini-kicker">MY SAJU NOTE ✦</span><h1 id="workspaceTitle">나의 사주 리포트</h1></div></div>
         <div class="header-actions"><button id="printButton" class="ghost-button compact-reset" type="button">인쇄·PDF</button><button id="resetButton" class="ghost-button compact-reset" type="button">정보 수정</button></div>
       </header>
       <nav class="main-nav compact-nav candy-launcher card" aria-label="리포트 메뉴">
@@ -201,9 +211,9 @@
     <div class="loading-card bunny-loading">
       <div class="loading-sky loading-hop-stage" aria-hidden="true">
         <picture class="loading-bunny-motion">
-          <source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="{{ url_for('static', filename='assets/loading-bunny-short-loop-poster-v1.png', v='20260831-higher-hop-54') }}">
-          <source type="image/webp" srcset="{{ url_for('static', filename='assets/loading-bunny-short-loop-v1.webp', v='20260831-higher-hop-54') }}">
-          <img src="{{ url_for('static', filename='assets/loading-bunny-short-loop-poster-v1.png', v='20260831-higher-hop-54') }}" alt="">
+          <source media="(prefers-reduced-motion: reduce)" type="image/png" srcset="{{ url_for('static', filename='assets/loading-bunny-short-loop-poster-v1.png', v='20260831-public-deploy-56') }}">
+          <source type="image/webp" srcset="{{ url_for('static', filename='assets/loading-bunny-short-loop-v1.webp', v='20260831-public-deploy-56') }}">
+          <img src="{{ url_for('static', filename='assets/loading-bunny-short-loop-poster-v1.png', v='20260831-public-deploy-56') }}" alt="">
         </picture>
       </div>
       <strong id="loadingTitle">리포트를 만들고 있어요</strong>
@@ -225,6 +235,6 @@
   {% if test_mode and test_fixture %}
   <script id="testFixtureData" type="application/json">{{ test_fixture|tojson }}</script>
   {% endif %}
-  <script src="{{ url_for('static', filename='app.js', v='20260831-higher-hop-54') }}"></script>
+  <script src="{{ url_for('static', filename='app.js', v='20260831-public-deploy-56') }}"></script>
 </body>
 </html>

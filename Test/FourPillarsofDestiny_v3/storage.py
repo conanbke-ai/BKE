@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import uuid
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any
@@ -18,8 +20,15 @@ def _default(value: Any):
 
 
 def write_json(path: Path, data: Any) -> Path:
+    if not SETTINGS.persist_user_data:
+        return path
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2, default=_default), encoding='utf-8')
+    temporary = path.with_name(f'.{path.name}.{uuid.uuid4().hex}.tmp')
+    try:
+        temporary.write_text(json.dumps(data, ensure_ascii=False, indent=2, default=_default), encoding='utf-8')
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
     return path
 
 

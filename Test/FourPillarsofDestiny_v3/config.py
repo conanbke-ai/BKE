@@ -26,20 +26,39 @@ def _env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {'1', 'true', 'yes', 'y', 'on'}
 
 
+def _env_path(name: str, default: Path) -> Path:
+    value = str(os.getenv(name) or '').strip()
+    return Path(value or default).expanduser().resolve()
+
+
+STATE_DIR = _env_path('STATE_DIR', ROOT)
+DATA_DIR = _env_path('DATA_DIR', STATE_DIR / 'data')
+BROWSER_PROFILE_DIR = _env_path('BROWSER_PROFILE_DIR', STATE_DIR / '.browser-profile')
+
+
 @dataclass(frozen=True)
 class Settings:
     # 서비스 화면에는 내부 버전명을 노출하지 않는다.
     app_name: str = '나의 사주 리포트'
     root: Path = ROOT
-    data_dir: Path = ROOT / 'data'
+    state_dir: Path = STATE_DIR
+    data_dir: Path = DATA_DIR
     cache_dir: Path = data_dir / 'cache'
     report_dir: Path = data_dir / 'reports'
     forceteller_dir: Path = data_dir / 'forceteller'
-    browser_profile_dir: Path = ROOT / '.browser-profile'
+    browser_profile_dir: Path = BROWSER_PROFILE_DIR
 
     host: str = os.getenv('HOST', '127.0.0.1')
     port: int = _env_int('PORT', 8787)
     debug: bool = _env_bool('DEBUG', False)
+    public_deployment: bool = _env_bool('PUBLIC_DEPLOYMENT', False)
+    persist_user_data: bool = _env_bool('PERSIST_USER_DATA', True)
+    external_source_enabled: bool = _env_bool('EXTERNAL_SOURCE_ENABLED', True)
+    rate_limit_enabled: bool = _env_bool('RATE_LIMIT_ENABLED', True)
+    max_request_bytes: int = max(32_768, _env_int('MAX_REQUEST_BYTES', 524_288))
+    max_group_members: int = max(2, _env_int('MAX_GROUP_MEMBERS', 20))
+    analysis_queue_timeout_seconds: int = max(0, _env_int('ANALYSIS_QUEUE_TIMEOUT_SECONDS', 2))
+    browser_queue_timeout_seconds: int = max(1, _env_int('BROWSER_QUEUE_TIMEOUT_SECONDS', 900))
 
     forceteller_edit_url: str = os.getenv('FORCETELLER_EDIT_URL', 'https://pro.forceteller.com/profile/edit')
     default_location_text: str = os.getenv('FORCETELLER_LOCATION_TEXT', '서울특별시, 대한민국')
@@ -77,6 +96,8 @@ class Settings:
 
 
 SETTINGS = Settings()
+if SETTINGS.public_deployment and SETTINGS.debug:
+    raise RuntimeError('PUBLIC_DEPLOYMENT=1에서는 DEBUG=1을 사용할 수 없습니다.')
 for directory in (
     SETTINGS.data_dir,
     SETTINGS.cache_dir,

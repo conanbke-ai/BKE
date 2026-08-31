@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: mongle-saju-report
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: Test/FourPillarsofDestiny_v3
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    envVars:
+      - key: PUBLIC_DEPLOYMENT
+        value: "1"
+      - key: PERSIST_USER_DATA
+        value: "0"
+      - key: EXTERNAL_SOURCE_ENABLED
+        value: "0"
+      - key: AI_ENABLED
+        value: "0"
+      - key: BUILD_AUTO_MATCHES
+        value: "0"
+      - key: ALLOW_FORCE_AI_REGENERATION
+        value: "0"
+      - key: HEADLESS
+        value: "1"
+      - key: DEBUG
+        value: "0"
+      - key: RATE_LIMIT_ENABLED
+        value: "1"
+      - key: MAX_REQUEST_BYTES
+        value: "524288"
+      - key: MAX_GROUP_MEMBERS
+        value: "20"
+      - key: ANALYSIS_QUEUE_TIMEOUT_SECONDS
+        value: "2"
+      - key: BROWSER_QUEUE_TIMEOUT_SECONDS
+        value: "900"
+      - key: STATE_DIR
+        value: /var/data
+      - key: DATA_DIR
+        value: /var/data/data
+      - key: BROWSER_PROFILE_DIR
+        value: /var/data/browser-profile
+      - key: GUNICORN_THREADS
+        value: "4"
+      - key: GUNICORN_TIMEOUT
+        value: "900"

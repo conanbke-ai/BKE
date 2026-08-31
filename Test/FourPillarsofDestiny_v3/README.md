@@ -178,6 +178,21 @@ tests/                 핵심 계약 자동 테스트
 
 ## 배포 전 확인
 
+### 공개 체험 서비스 배포
+
+저장소 루트의 `render.yaml`은 Render의 무료 단일 Docker 서비스용 설정입니다. 공개 체험 배포는 비용과 개인정보 노출을 막기 위해 다음 안전 모드로 시작합니다.
+
+- `PUBLIC_DEPLOYMENT=1`: `/test`를 항상 404로 막고 동일 출처 JSON 요청만 허용합니다.
+- `PERSIST_USER_DATA=0`: 이름·생년월일시·리포트를 서버 파일에 저장하지 않습니다.
+- `EXTERNAL_SOURCE_ENABLED=0`, `AI_ENABLED=0`: 입력 정보를 외부 원국 서비스나 유료 AI로 보내지 않고 로컬 계산과 기본 해설만 사용합니다.
+- `BUILD_AUTO_MATCHES=0`: 무료 인스턴스를 장시간 점유하는 TOP 10 전수 탐색은 공개 체험판에서 끄고, 내 사주·운세·1:1·그룹 궁합을 우선 제공합니다.
+- 요청 크기·호출 빈도·그룹 최대 인원·동시 분석 수를 제한합니다.
+- Gunicorn은 진행 상태가 한 프로세스 안에서 유지되도록 worker 1개와 thread 4개로 실행합니다.
+
+Render에서 저장소를 Blueprint로 연결하면 `mongle-saju-report.onrender.com` 형식의 공개 URL이 발급됩니다. 무료 인스턴스는 일정 시간 사용이 없으면 잠들고 로컬 파일이 유지되지 않으므로, 외부 원국·AI·캐시 영속화를 운영하려면 유료 인스턴스와 영속 디스크, 개인정보 처리방침 및 비용 한도를 별도로 준비해야 합니다.
+
+운영 상태 확인 경로는 `/healthz`입니다. 공개 사용자는 `/`만 사용하며 `/test`는 로컬 개발 전용입니다.
+
 ```bash
 .venv-fourpillars-v3\Scripts\python.exe reparse_cache.py
 .venv-fourpillars-v3\Scripts\python.exe verify_project.py

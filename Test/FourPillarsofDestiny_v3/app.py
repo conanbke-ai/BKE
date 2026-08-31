@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+import threading
+import time
 import traceback
+from collections import defaultdict, deque
 from datetime import datetime
+from functools import wraps
+from ipaddress import ip_address
+from urllib.parse import urlsplit
 
 from flask import Flask, abort, jsonify, render_template, request
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import SETTINGS
 from locations import COUNTRIES
@@ -15,14 +22,39 @@ from progress_tracker import (
     get_job,
 )
 from services import birth_profile_from_dict, group_analysis, initial_analysis, pair_analysis
-from test_fixture import FULL_TEST_FIXTURE
+
+if not SETTINGS.public_deployment:
+    from test_fixture import FULL_TEST_FIXTURE
+else:
+    FULL_TEST_FIXTURE = None
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+app.config['MAX_CONTENT_LENGTH'] = SETTINGS.max_request_bytes
+if SETTINGS.public_deployment:
+    # Render terminates TLS at one trusted proxy hop.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+_RATE_LOCK = threading.RLock()
+_RATE_BUCKETS: dict[tuple[str, str], deque[float]] = defaultdict(deque)
+_ANALYSIS_SLOT = threading.BoundedSemaphore(1)
+_RATE_POLICIES = {
+    'api_progress_estimate': (60, 60),
+    'api_progress_start': (12, 60),
+    'api_progress': (180, 60),
+    'api_progress_cancel': (30, 60),
+    'api_initial': (3, 600),
+    'api_pair': (8, 600),
+    'api_group': (5, 600),
+}
+_MAX_RATE_BUCKETS = 4096
 
 
 def _record_server_error(context: str, exc: Exception) -> None:
     """Keep technical details in the server log and never expose raw exceptions in the UI."""
+    if SETTINGS.public_deployment or not SETTINGS.persist_user_data:
+        app.logger.error('%s failed (%s)', context, type(exc).__name__)
+        return
     folder = SETTINGS.data_dir / 'errors'
     folder.mkdir(parents=True, exist_ok=True)
     with (folder / 'server_errors.log').open('a', encoding='utf-8') as fp:
@@ -58,6 +90,151 @@ def _as_bool(value: object, default: bool = False) -> bool:
     return default
 
 
+def _safe_progress_summary(value: object) -> dict:
+    if not isinstance(value, dict):
+        return {}
+    result: dict[str, object] = {}
+    for key in ('build_matches', 'include_pair', 'disable_timing_learning'):
+        result[key] = _as_bool(value.get(key), False)
+    if SETTINGS.public_deployment:
+        result['build_matches'] = False
+    for key, low, high in (
+        ('birth_year', 1900, 2100),
+        ('group_members', 0, SETTINGS.max_group_members),
+        ('members', 0, SETTINGS.max_group_members),
+    ):
+        try:
+            result[key] = min(high, max(low, int(value.get(key) or 0)))
+        except (TypeError, ValueError):
+            result[key] = low
+    result['timing_profile'] = 'live' if str(value.get('timing_profile') or '').lower() == 'live' else 'preview'
+    return result
+
+
+def _same_origin() -> bool:
+    origin = str(request.headers.get('Origin') or '').strip()
+    if not origin:
+        return True
+    supplied = urlsplit(origin)
+    expected = urlsplit(request.host_url)
+    return (supplied.scheme, supplied.netloc) == (expected.scheme, expected.netloc)
+
+
+def _client_identity() -> str:
+    """Use Render's first X-Forwarded-For value, falling back to the socket peer."""
+    if SETTINGS.public_deployment:
+        candidate = str(request.headers.get('X-Forwarded-For') or '').split(',', 1)[0].strip()
+        try:
+            if candidate:
+                return str(ip_address(candidate))
+        except ValueError:
+            pass
+    return str(request.remote_addr or 'unknown')
+
+
+def _prune_rate_buckets(now: float) -> None:
+    """Discard expired identities and keep the in-memory limiter strictly bounded."""
+    for stale_key, values in list(_RATE_BUCKETS.items()):
+        policy = _RATE_POLICIES.get(stale_key[1])
+        window = policy[1] if policy else 600
+        cutoff = now - window
+        while values and values[0] <= cutoff:
+            values.popleft()
+        if not values:
+            _RATE_BUCKETS.pop(stale_key, None)
+
+    overflow = len(_RATE_BUCKETS) - _MAX_RATE_BUCKETS
+    if overflow <= 0:
+        return
+    oldest = sorted(
+        _RATE_BUCKETS.items(),
+        key=lambda item: item[1][-1] if item[1] else float('-inf'),
+    )
+    for stale_key, _values in oldest[:overflow]:
+        _RATE_BUCKETS.pop(stale_key, None)
+
+
+def _rate_limit_response():
+    policy = _RATE_POLICIES.get(str(request.endpoint or ''))
+    if not (SETTINGS.public_deployment and SETTINGS.rate_limit_enabled and policy):
+        return None
+    limit, window = policy
+    now = time.monotonic()
+    identity = _client_identity()
+    key = (identity, str(request.endpoint))
+    with _RATE_LOCK:
+        bucket = _RATE_BUCKETS[key]
+        cutoff = now - window
+        while bucket and bucket[0] <= cutoff:
+            bucket.popleft()
+        if len(bucket) >= limit:
+            retry_after = max(1, int(window - (now - bucket[0])))
+            response = jsonify({'ok': False, 'error': '요청이 잠시 몰렸어요. 잠시 후 다시 시도해 주세요.'})
+            response.status_code = 429
+            response.headers['Retry-After'] = str(retry_after)
+            return response
+        bucket.append(now)
+        if len(_RATE_BUCKETS) > _MAX_RATE_BUCKETS:
+            _prune_rate_buckets(now)
+    return None
+
+
+def _analysis_guard(handler):
+    @wraps(handler)
+    def wrapped(*args, **kwargs):
+        acquired = False
+        if SETTINGS.public_deployment:
+            acquired = _ANALYSIS_SLOT.acquire(timeout=SETTINGS.analysis_queue_timeout_seconds)
+            if not acquired:
+                response = jsonify({'ok': False, 'error': '다른 리포트를 정리하고 있어요. 잠시 후 다시 시도해 주세요.'})
+                response.status_code = 503
+                response.headers['Retry-After'] = '10'
+                return response
+        try:
+            return handler(*args, **kwargs)
+        finally:
+            if acquired:
+                _ANALYSIS_SLOT.release()
+    return wrapped
+
+
+def _validate_group_rows(rows: object, *, includes_user: bool) -> list:
+    if not isinstance(rows, list):
+        raise ValueError('그룹 구성원 형식을 확인해 주세요.')
+    total = len(rows) + (1 if includes_user else 0)
+    if total > SETTINGS.max_group_members:
+        raise ValueError(f'그룹은 본인을 포함해 최대 {SETTINGS.max_group_members}명까지 분석할 수 있습니다.')
+    return rows
+
+
+@app.before_request
+def protect_public_api():
+    if SETTINGS.public_deployment and request.path.startswith('/api/'):
+        if request.method in {'POST', 'PUT', 'PATCH'} and not request.is_json:
+            return jsonify({'ok': False, 'error': 'JSON 형식의 요청만 사용할 수 있습니다.'}), 415
+        if request.method in {'POST', 'PUT', 'PATCH', 'DELETE'} and not _same_origin():
+            return jsonify({'ok': False, 'error': '허용되지 않은 요청 출처입니다.'}), 403
+    return _rate_limit_response()
+
+
+@app.after_request
+def add_security_headers(response):
+    response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+    response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
+    response.headers.setdefault('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+    response.headers.setdefault('Content-Security-Policy', "frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
+    if request.path.startswith('/api/'):
+        response.headers.setdefault('Cache-Control', 'no-store')
+    if SETTINGS.public_deployment and request.is_secure:
+        response.headers.setdefault('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+    return response
+
+
+@app.errorhandler(413)
+def request_too_large(_error):
+    return jsonify({'ok': False, 'error': '요청 내용이 너무 큽니다.'}), 413
+
+
 def _job_callback(job_id: str | None):
     job = get_job(job_id)
     if not job:
@@ -74,14 +251,14 @@ def _job_callback(job_id: str | None):
 def api_progress_estimate():
     data = request.get_json(silent=True) or {}
     kind = _normalized_progress_kind(data.get('kind'))
-    return jsonify({'ok': True, 'data': estimate_progress(kind, data.get('summary') or {})})
+    return jsonify({'ok': True, 'data': estimate_progress(kind, _safe_progress_summary(data.get('summary')))})
 
 
 @app.post('/api/progress/start')
 def api_progress_start():
     data = request.get_json(silent=True) or {}
     kind = _normalized_progress_kind(data.get('kind'))
-    job = create_job(kind, data.get('summary') or {})
+    job = create_job(kind, _safe_progress_summary(data.get('summary')))
     return jsonify({'ok': True, 'data': job.snapshot()})
 
 
@@ -104,7 +281,18 @@ def api_progress_cancel(job_id: str):
 @app.get('/')
 def index():
     # 일반 화면에는 로컬 접속이어도 개발용 인적 정보와 테스트 조작을 전달하지 않습니다.
-    return render_template('index.html', app_name=SETTINGS.app_name, test_mode=False, test_fixture=None)
+    return render_template(
+        'index.html',
+        app_name=SETTINGS.app_name,
+        test_mode=False,
+        test_fixture=None,
+        public_deployment=SETTINGS.public_deployment,
+    )
+
+
+@app.get('/healthz')
+def healthz():
+    return jsonify({'ok': True, 'status': 'ready'})
 
 
 def _is_local_request() -> bool:
@@ -114,13 +302,14 @@ def _is_local_request() -> bool:
 @app.get('/test')
 def test_screen():
     # 테스트 입력에는 실제 개발용 인적 정보가 들어 있으므로 localhost에서만 노출합니다.
-    if not _is_local_request():
+    if SETTINGS.public_deployment or not _is_local_request():
         abort(404)
     return render_template(
         'index.html',
         app_name=SETTINGS.app_name,
         test_mode=True,
         test_fixture=FULL_TEST_FIXTURE,
+        public_deployment=False,
     )
 
 
@@ -137,6 +326,7 @@ def config():
 
 
 @app.post('/api/initial')
+@_analysis_guard
 def api_initial():
     data = request.get_json(force=True) or {}
     job = get_job(str(data.get('job_id') or ''))
@@ -144,13 +334,18 @@ def api_initial():
         if job:
             job.ensure_active()
         profile = birth_profile_from_dict(data.get('profile') or {})
+        group_request = data.get('group_request')
+        if group_request:
+            if not isinstance(group_request, dict):
+                raise ValueError('그룹 요청 형식을 확인해 주세요.')
+            _validate_group_rows(group_request.get('members') or [], includes_user=True)
         result = initial_analysis(
             profile,
             force_ai=_as_bool(data.get('force_ai'), False),
             ai_cache_only=_as_bool(data.get('ai_cache_only'), False),
-            build_matches=data.get('build_matches'),
+            build_matches=False if SETTINGS.public_deployment else data.get('build_matches'),
             pair_request=data.get('pair_request'),
-            group_request=data.get('group_request'),
+            group_request=group_request,
             progress_callback=_job_callback(data.get('job_id')),
         )
         if job:
@@ -175,6 +370,7 @@ def api_initial():
 
 
 @app.post('/api/pair')
+@_analysis_guard
 def api_pair():
     data = request.get_json(force=True) or {}
     job = get_job(str(data.get('job_id') or ''))
@@ -214,13 +410,14 @@ def api_pair():
 
 
 @app.post('/api/group')
+@_analysis_guard
 def api_group():
     data = request.get_json(force=True) or {}
     job = get_job(str(data.get('job_id') or ''))
     try:
         if job:
             job.ensure_active()
-        rows = data.get('members') or []
+        rows = _validate_group_rows(data.get('members') or [], includes_user=False)
         if len(rows) < 2:
             return jsonify({'ok': False, 'error': '그룹 분석에는 최소 2명이 필요합니다.'}), 400
         profiles = [birth_profile_from_dict(row, default_name=f'멤버 {index + 1}') for index, row in enumerate(rows)]

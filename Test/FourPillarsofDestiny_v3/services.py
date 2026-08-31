@@ -58,6 +58,13 @@ def _required_int(data: dict[str, Any], key: str, label: str) -> int:
         raise ValueError(f'{label}을 숫자로 입력해 주세요.') from exc
 
 
+def _bounded_text(value: object, label: str, maximum: int, *, fallback: str = '') -> str:
+    text = str(value or fallback).strip()
+    if len(text) > maximum:
+        raise ValueError(f'{label}은 {maximum}자 이내로 입력해 주세요.')
+    return text
+
+
 def _validate_birth_values(*, calendar_type: str, year: int, month: int, day: int, hour: int, minute: int, time_known: bool) -> None:
     if not 1900 <= year <= 2100:
         raise ValueError('출생연도는 1900~2100년 사이로 입력해 주세요.')
@@ -79,11 +86,13 @@ def _validate_birth_values(*, calendar_type: str, year: int, month: int, day: in
 
 
 def birth_profile_from_dict(data: dict[str, Any], *, default_name: str = '분석대상') -> BirthProfile:
-    code = str(data.get('country_code') or 'KR').upper().strip()
-    country = str(data.get('country') or country_name(code)).strip()
-    city = str(data.get('city') or '').strip()
+    if not isinstance(data, dict):
+        raise ValueError('출생정보 형식을 확인해 주세요.')
+    code = _bounded_text(data.get('country_code') or 'KR', '국가 코드', 8).upper()
+    country = _bounded_text(data.get('country') or country_name(code), '출생 국가', 80)
+    city = _bounded_text(data.get('city'), '출생 도시', 80)
     location, default_location_id = location_fields(code, country, city)
-    location_id = str(data.get('location_id') or default_location_id or '')
+    location_id = _bounded_text(data.get('location_id') or default_location_id, '지역 코드', 120)
     if code == 'KR' and not location_id:
         location_id = SETTINGS.default_location_id
 
@@ -112,8 +121,9 @@ def birth_profile_from_dict(data: dict[str, Any], *, default_name: str = '분석
 
     gender_raw = str(data.get('gender', 'F')).upper().strip()
     partner_raw = str(data.get('partner_gender', 'M')).upper().strip()
+    name = _bounded_text(data.get('name') or default_name, '이름', 40, fallback=default_name) or default_name
     profile = BirthProfile(
-        name=str(data.get('name') or default_name).strip() or default_name,
+        name=name,
         gender='M' if gender_raw == 'M' else 'F',
         calendar_type=calendar_type,
         year=year, month=month, day=day,

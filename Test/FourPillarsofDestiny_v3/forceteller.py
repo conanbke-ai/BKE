@@ -5,6 +5,7 @@ import json
 import os
 import re
 import shutil
+import threading
 import time
 from copy import deepcopy
 from functools import lru_cache
@@ -42,6 +43,7 @@ SEL = {
 ELEMENT_KO_TO_HANJA = {'목': '木', '화': '火', '토': '土', '금': '金', '수': '水'}
 TEN_GOD_NAMES = ('비견', '겁재', '식신', '상관', '편재', '정재', '편관', '정관', '편인', '정인')
 STRENGTH_LABELS = ('중화신약', '중화신강', '극신약', '극신강', '신약', '신강', '중화')
+_BROWSER_COLLECTION_LOCK = threading.Lock()
 
 
 def _fill_masked(locator, value: str) -> None:
@@ -1214,6 +1216,8 @@ def _friendly_collection_warning(kind: str = 'collection') -> str:
 
 def _write_internal_error(folder: Path, exc: Exception) -> None:
     """브라우저/셀렉터 오류는 서비스 화면에 노출하지 않고 개발용 파일에만 남긴다."""
+    if not SETTINGS.persist_user_data:
+        return
     try:
         (folder / 'collector_error.txt').write_text(
             f'{type(exc).__name__}: {exc}',
@@ -1276,13 +1280,14 @@ def _collect_on_page(page, profile: BirthProfile, folder: Path) -> ForcetellerFa
         if len(rendered2) >= len(rendered):
             text, rendered = text2, rendered2
 
-    (folder / 'result.txt').write_text(text, encoding='utf-8')
-    (folder / 'result.html').write_text(rendered, encoding='utf-8')
-    write_json(folder / 'network.json', network)
-    try:
-        page.screenshot(path=str(folder / 'result.png'), full_page=True)
-    except Exception:
-        pass
+    if SETTINGS.persist_user_data:
+        (folder / 'result.txt').write_text(text, encoding='utf-8')
+        (folder / 'result.html').write_text(rendered, encoding='utf-8')
+        write_json(folder / 'network.json', network)
+        try:
+            page.screenshot(path=str(folder / 'result.png'), full_page=True)
+        except Exception:
+            pass
     write_json(folder / 'metadata.json', {
         'profile': profile.as_dict(),
         'location_text': location_text,
@@ -1606,7 +1611,7 @@ def _facts_completeness_score(facts: ForcetellerFacts, folder: Path) -> int:
 
 
 def _copy_best_raw_source(source: Path, target: Path) -> None:
-    if source == target:
+    if source == target or not SETTINGS.persist_user_data:
         return
     target.mkdir(parents=True, exist_ok=True)
     for filename in ('result.html', 'result.txt', 'network.json', 'result.png'):
@@ -1714,7 +1719,8 @@ def _resolve_best_cached_facts(
     merged_data = merged.as_dict()
     usable = _cached_facts_usable(merged_data, False)
 
-    canonical_folder.mkdir(parents=True, exist_ok=True)
+    if SETTINGS.persist_user_data:
+        canonical_folder.mkdir(parents=True, exist_ok=True)
     if usable:
         _copy_best_raw_source(best_folder, canonical_folder)
         write_json(canonical_folder / 'forceteller_facts.json', merged_data)
@@ -1838,7 +1844,8 @@ def collect_many_facts(
             assign(identity, resolved)
             completed_sources += 1
             continue
-        folder.mkdir(parents=True, exist_ok=True)
+        if SETTINGS.persist_user_data:
+            folder.mkdir(parents=True, exist_ok=True)
         pending.append((identity, profile, folder))
 
     cache_hits = completed_sources
@@ -1865,7 +1872,7 @@ def collect_many_facts(
 
     emit(progress_message(pending[0][1], active=True))
 
-    if sync_playwright is None:
+    if sync_playwright is None or not SETTINGS.external_source_enabled:
         for identity, profile, folder in pending:
             fallback = _fallback_preserving_existing(profile, folder, _friendly_collection_warning())
             write_json(folder / 'forceteller_facts.json', fallback.as_dict())
@@ -1874,6 +1881,15 @@ def collect_many_facts(
             emit(progress_message(profile))
         if progress_callback:
             progress_callback(1.0, '필요한 원국 자료를 모두 확인했어요.')
+        return [x for x in results if x is not None]
+
+    if not _BROWSER_COLLECTION_LOCK.acquire(timeout=SETTINGS.browser_queue_timeout_seconds):
+        for identity, profile, folder in pending:
+            fallback = _fallback_preserving_existing(profile, folder, '원국 보조자료 확인이 지연되어 로컬 계산을 우선 사용했습니다.')
+            write_json(folder / 'forceteller_facts.json', fallback.as_dict())
+            assign(identity, fallback)
+            completed_sources += 1
+            emit(progress_message(profile))
         return [x for x in results if x is not None]
 
     try:
@@ -1924,6 +1940,8 @@ def collect_many_facts(
                 assign(identity, fallback)
                 completed_sources += 1
                 emit(progress_message(profile))
+    finally:
+        _BROWSER_COLLECTION_LOCK.release()
 
     if progress_callback:
         progress_callback(1.0, '필요한 원국 자료를 모두 확인했어요.')

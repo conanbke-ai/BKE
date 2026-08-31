@@ -58,7 +58,7 @@ class TimingMetrics:
         return max(0.15, per_unit * max(0.01, units))
 
     def record(self, key: str, elapsed: float, *, units: float = 1.0) -> None:
-        if elapsed <= 0:
+        if elapsed <= 0 or not SETTINGS.persist_user_data:
             return
         units = max(0.01, units)
         sample = elapsed / units

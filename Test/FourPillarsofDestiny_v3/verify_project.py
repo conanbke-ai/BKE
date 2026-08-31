@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parent
 
 REQUIRED_FILES = [
     'app.py',
+    'Dockerfile',
+    '.dockerignore',
     'services.py',
     'group.py',
     'forceteller.py',
