@@ -71,10 +71,10 @@ for element_id in ['loading', 'loadingStage', 'loadingPercent', 'loadingProgress
                    'loadingRemaining', 'loadingSteps', 'cancelAnalysisButton']:
     check(f'loading mapping: {element_id}', f'id="{element_id}"' in HTML and f'#{element_id}' in JS)
 
-check('loading image exists', (ROOT / 'static/assets/loading-bunny-hop.webp').is_file())
-check('loading motion exists', '@keyframes loadingBunnyHop' in CSS and '@keyframes loadingBunnyShadow' in CSS and '.loading-bunny-sprite' in CSS)
+check('loading image exists', (ROOT / 'static/assets/loading-bunny-short-loop-v1.webp').is_file() and (ROOT / 'static/assets/loading-bunny-short-loop-poster-v1.png').is_file())
+check('loading motion exists', '.loading-bunny-motion' in CSS and 'loading-bunny-short-loop-v1.webp' in HTML and 'loading-bunny-short-loop-poster-v1.png' in HTML)
 check('responsive layout exists', '@media(max-width:620px)' in CSS)
-check('reduced motion fallback exists', 'prefers-reduced-motion:reduce' in CSS)
+check('reduced motion fallback exists', 'prefers-reduced-motion:reduce' in CSS and 'media="(prefers-reduced-motion: reduce)"' in HTML)
 check('keyboard group exploration exists', "addEventListener('keydown'" in JS)
 
 failed = [label for label, ok in checks if not ok]

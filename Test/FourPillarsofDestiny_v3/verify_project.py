@@ -27,8 +27,10 @@ REQUIRED_FILES = [
     'static/assets/intro-splash.png',
     'static/assets/input-header-rainbow-v2.png',
     'static/assets/app-background-clouds-v2.png',
-    'static/assets/loading-bunny-hop.webp',
-    'static/assets/loading-bunny-hop-fallback.png',
+    'static/assets/loading-bunny-run-sprites-v1.png',
+    'static/assets/loading-bunny-short-loop-v1.webp',
+    'static/assets/loading-bunny-short-loop-poster-v1.png',
+    'build_loading_animation.py',
     'audit_contracts.py',
 ]
 REQUIRED_JS_FUNCTIONS = [
@@ -107,10 +109,11 @@ def main() -> int:
             fail(errors, '첫 화면에 분리 렌더링하던 구형 hero 토끼 DOM이 다시 포함되어 있습니다.')
         if 'assets/input-header-rainbow-v2.png' not in template or 'input-header-static-image' not in template:
             fail(errors, '입력 화면의 정지형 토끼·무지개 헤더 아트가 누락되어 있습니다.')
-        if 'assets/loading-bunny-hop-fallback.png' not in template or 'loading-bunny-sprite' not in template:
-            fail(errors, '로딩 전용 전체 토끼 이미지와 모션 장면이 누락되어 있습니다.')
-        if 'assets/loading-bunny-hop.webp' in template:
-            fail(errors, '프레임 잘림이 있던 구형 WebP 로딩 토끼가 다시 연결되어 있습니다.')
+        for required in ('loading-bunny-motion', 'assets/loading-bunny-short-loop-v1.webp', 'assets/loading-bunny-short-loop-poster-v1.png', 'media="(prefers-reduced-motion: reduce)"'):
+            if required not in template:
+                fail(errors, f'숏영상형 로딩 토끼 장면 계약 누락: {required}')
+        if 'loading-bunny-sprite' in template or 'assets/loading-bunny-hop-fallback.png' in template or 'assets/loading-bunny-hop.webp' in template:
+            fail(errors, '스티커식 구형 로딩 토끼 장면이 다시 연결되어 있습니다.')
         if '확실히 아는 정보만 입력해도 됩니다.' in template:
             fail(errors, '삭제 요청된 내 출생정보 보조 문구가 다시 포함되어 있습니다.')
 
@@ -168,7 +171,7 @@ def main() -> int:
             fail(errors, '폐기한 손그림 토끼 CSS가 다시 포함되어 있습니다.')
         if '--text-control:' not in css or 'button{touch-action:manipulation;font-size:var(--text-control)}' not in css:
             fail(errors, '공통 버튼 글자 크기 토큰/기준이 누락되어 있습니다.')
-        for required in ('--rainbow-soft:', '.candy-launcher{', '.loading-sky{', '@keyframes loadingBunnyHop', '@keyframes loadingBunnyShadow'):
+        for required in ('--rainbow-soft:', '.candy-launcher{', '.loading-sky{', '.loading-bunny-motion{'):
             if required not in css:
                 fail(errors, f'핑크+무지개/로딩 UI 스타일 계약 누락: {required}')
         for selector in ('.birth-picker-open{', '.time-choice-button{'):
@@ -177,12 +180,18 @@ def main() -> int:
             if 'font-size:var(--text-control)' not in block:
                 fail(errors, f'입력 보조 컨트롤 글자 크기 기준 누락: {selector[:-1]}')
 
-    for png_name in ('bunny-hero-a1.png', 'intro-splash.png'):
+    for png_name in ('bunny-hero-a1.png', 'intro-splash.png', 'loading-bunny-run-sprites-v1.png', 'loading-bunny-short-loop-poster-v1.png'):
         png_path = ROOT / 'static/assets' / png_name
         if png_path.is_file():
             data = png_path.read_bytes()
             if len(data) < 1024 or not data.startswith(b'\x89PNG\r\n\x1a\n'):
                 fail(errors, f'{png_name} 파일이 정상 PNG로 보이지 않습니다.')
+
+    loading_webp = ROOT / 'static/assets/loading-bunny-short-loop-v1.webp'
+    if loading_webp.is_file():
+        data = loading_webp.read_bytes()
+        if len(data) < 20_000 or data[:4] != b'RIFF' or data[8:12] != b'WEBP':
+            fail(errors, '숏영상형 로딩 토끼 파일이 정상 WebP로 보이지 않습니다.')
 
     audit_path = ROOT / 'audit_contracts.py'
     if audit_path.is_file():

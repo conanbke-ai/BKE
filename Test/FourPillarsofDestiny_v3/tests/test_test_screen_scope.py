@@ -17,6 +17,20 @@ def _effective_css_property(css: str, selector: str, property_name: str) -> str 
     return value
 
 
+def _animated_webp_durations(data: bytes) -> list[int]:
+    """Read ANMF frame durations without adding Pillow to the test runtime."""
+    durations: list[int] = []
+    offset = 12
+    while offset + 8 <= len(data):
+        chunk_type = data[offset:offset + 4]
+        chunk_size = int.from_bytes(data[offset + 4:offset + 8], 'little')
+        payload = offset + 8
+        if chunk_type == b'ANMF' and payload + 15 <= len(data):
+            durations.append(int.from_bytes(data[payload + 12:payload + 15], 'little'))
+        offset = payload + chunk_size + (chunk_size & 1)
+    return durations
+
+
 def test_regular_screen_never_exposes_local_test_fixture():
     client = app.test_client()
     response = client.get('/')
@@ -74,7 +88,7 @@ def test_rainbow_pink_theme_keeps_mobile_title_bunny_and_buttons_aligned():
     js = (root / 'static' / 'app.js').read_text(encoding='utf-8')
 
     assert 'class="intro-mobile-copy"' in html
-    assert html.count('20260829-rainbow-cloud-52') == 7
+    assert html.count('20260831-loading-film-53') == 9
     assert '<h1>나만의 사주 이야기</h1>' in html
     assert '.input-screen-title{z-index:3;margin-left:92px}' in css
     assert '.input-screen-title{max-width:165px;margin-left:45px}' in css
@@ -390,23 +404,38 @@ def test_loading_scene_and_report_brand_use_soft_pastels():
         "url('/static/assets/app-background-clouds-v2.png') center/cover no-repeat"
     )
     assert _effective_css_property(css, '.loading', 'backdrop-filter') == 'none'
-    assert _effective_css_property(css, '.loading-sky', 'background') == 'transparent'
-    assert '.loading-bunny-sprite{inset:14px 18px 18px;z-index:3;animation:loadingBunnyHop 1.85s cubic-bezier(.45,.04,.26,1) infinite' in css
-    assert '@media(prefers-reduced-motion:reduce){.loading-bunny-sprite,.loading-bunny-sprite::after{animation:none}' in css
-    assert _effective_css_property(css, '.loading-bunny-sprite img', 'transform') == 'none'
-    assert _effective_css_property(css, '.loading-sky::before', 'height') == '82px'
-    assert _effective_css_property(css, '.loading-sky::before', 'z-index') == '2'
-    assert '@keyframes loadingBunnyHop{' in css
-    assert '@keyframes loadingBunnyShadow{' in css
-    assert '<span class="loading-bunny-sprite" aria-hidden="true">' in html
-    assert 'loading-bunny-hop.webp' not in html
+    assert _effective_css_property(css, '.loading-sky', 'background') == '#f8eaf4'
+    assert _effective_css_property(css, '.loading-sky::before', 'display') == 'none'
+    assert _effective_css_property(css, '.loading-sky::after', 'display') == 'none'
+    assert _effective_css_property(css, '.loading-bunny-motion', 'background') == (
+        "url('/static/assets/loading-bunny-short-loop-poster-v1.png') center/cover no-repeat"
+    )
+    assert _effective_css_property(css, '.loading-bunny-motion img', 'object-fit') == 'cover'
+    assert '<picture class="loading-bunny-motion">' in html
+    assert 'media="(prefers-reduced-motion: reduce)"' in html
+    assert html.count('assets/loading-bunny-short-loop-poster-v1.png') == 2
+    assert html.count('assets/loading-bunny-short-loop-v1.webp') == 1
+    assert 'loading-bunny-sprite' not in html
+    assert '@keyframes loadingBunnyHop{' not in css
+    assert '@keyframes loadingBunnyShadow{' not in css
+
+    animation = root / 'static' / 'assets' / 'loading-bunny-short-loop-v1.webp'
+    poster = root / 'static' / 'assets' / 'loading-bunny-short-loop-poster-v1.png'
+    sprite_sheet = root / 'static' / 'assets' / 'loading-bunny-run-sprites-v1.png'
+    animation_data = animation.read_bytes()
+    assert animation.stat().st_size > 20_000
+    assert animation_data[:4] == b'RIFF'
+    assert animation_data[8:12] == b'WEBP'
+    assert _animated_webp_durations(animation_data) == [280, 140, 140, 180, 140, 160, 220, 340]
+    assert poster.read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
+    assert sprite_sheet.read_bytes().startswith(b'\x89PNG\r\n\x1a\n')
+    assert (root / 'build_loading_animation.py').is_file()
     assert _effective_css_property(css, '.loading-progress-track', 'background') == '#fae4ee'
     assert _effective_css_property(css, '.loading-progress-fill', 'background') == (
         'linear-gradient(90deg,#eb679d 0%,#f28ba6 34%,#f3b77f 57%,#86cab2 79%,#89b4de 100%)'
     )
-    assert _effective_css_property(css, '.loading-rainbow', 'display') == 'none'
-    assert _effective_css_property(css, '.loading-aurora', 'display') == 'none'
-    assert _effective_css_property(css, '.loading-cloud', 'display') == 'none'
+    for removed_decoration in ('loading-rainbow', 'loading-aurora', 'loading-cloud', 'loading-stage-star'):
+        assert removed_decoration not in html
     assert _effective_css_property(css, '.loading-step.active .loading-step-index', 'background') == (
         'linear-gradient(135deg,#eb5f99,#f28e9c)'
     )
@@ -462,5 +491,5 @@ def test_loading_and_pair_score_are_information_dashboards():
     assert 'function compatibilityScorePanel(' in js
     assert 'compat-mini-axes' in js
     assert 'role="progressbar"' in html
-    assert 'loading-rainbow' in html
-    assert 'loading-aurora' in html
+    assert 'loading-bunny-motion' in html
+    assert 'loading-bunny-short-loop-v1.webp' in html

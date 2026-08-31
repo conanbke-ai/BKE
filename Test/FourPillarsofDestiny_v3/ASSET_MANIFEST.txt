@@ -1,32 +1,45 @@
-R39 실제 사용 이미지 목록 (미사용 이미지 0개)
+현재 이미지 자산 목록
+
+실행 화면에서 사용하는 자산
 
 static/assets/intro-splash.png
 - 최초 시작 화면 정지 이미지
-- 1672x941 PNG
-- 이미지 자체에는 시작하기 버튼이 없고 HTML 실제 버튼을 오버레이함
 
-static/assets/input-header-art.jpg
-- 출생정보 화면 상단 정지 이미지
-- 1800x600 JPEG
+static/assets/input-header-rainbow-v2.png
+- 출생정보 입력 화면 상단 토끼·무지개 이미지
 
-static/assets/app-background.jpg
-- 입력/서비스 화면 전체 배경
-- 1920x1080 JPEG
-
-static/assets/loading-bunny-hop.webp
-- 로딩 화면 전용 깡총 토끼 애니메이션
-- 340x340 / 6 frames / animated WebP
-
-static/assets/bunny-hero-a1.png
-- 결과 리포트 내부 요약/캐릭터 렌더링용
-- 240x258 PNG
+static/assets/app-background-clouds-v2.png
+- 입력·리포트·로딩 화면에 공통으로 쓰는 파스텔 구름 배경
 
 static/assets/report-bunny-badge.png
 - 결과 화면 상단 브랜드 토끼 배지
-- 320x320 PNG
 
-검증 결과
-- static/assets 파일 수: 6
-- 코드가 참조하는 assets 수: 6
-- 미사용 이미지: 0
-- 누락 이미지: 0
+static/assets/loading-bunny-short-loop-v1.webp
+- 로딩 화면 전용 8동작, 1.6초 무한 반복 Animated WebP
+- 토끼와 구름 배경을 한 장면으로 합성해 서로 따로 노는 현상을 없앰
+
+static/assets/loading-bunny-short-loop-poster-v1.png
+- Animated WebP를 지원하지 않거나 동작 줄이기를 사용하는 환경의 정지 포스터
+- CSS 배경 폴백에도 같은 장면을 사용함
+
+로딩 장면 제작 원본
+
+static/assets/loading-bunny-run-sprites-v1.png
+- 이미지 생성 기능으로 만든 4열×2행, 총 8개 동작 스프라이트 시트
+- 웹 화면에서는 직접 불러오지 않고 build_loading_animation.py의 입력으로만 사용함
+
+build_loading_animation.py
+- 스프라이트의 분리 노이즈를 제거하고 위치·크기·그림자를 보정함
+- app-background-clouds-v2.png와 합성해 Animated WebP와 PNG 포스터를 재생성함
+
+호환성·보존 자산
+
+static/assets/bunny-hero-a1.png
+static/assets/input-header-art.jpg
+static/assets/app-background.jpg
+
+정리 내용
+
+- 잘림과 루프 점프가 있던 loading-bunny-hop.webp 삭제
+- 정지 이미지를 CSS로 흔들던 loading-bunny-hop-fallback.png 삭제
+- 로딩 화면은 새 WebP 1개와 reduced-motion용 포스터 1개만 참조함
