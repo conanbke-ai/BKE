@@ -30,4 +30,4 @@ COPY --chown=appuser:appuser . .
 USER appuser
 
 EXPOSE 10000
-CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-10000} --workers 1 --threads ${GUNICORN_THREADS:-4} --timeout ${GUNICORN_TIMEOUT:-900} --graceful-timeout 30 --access-logfile - --error-logfile - wsgi:app"]
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-10000} --workers 1 --threads ${GUNICORN_THREADS:-4} --timeout ${GUNICORN_TIMEOUT:-900} --graceful-timeout 30 --access-logfile - --error-logfile - app:app"]
