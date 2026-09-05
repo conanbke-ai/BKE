@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any
 
 from config import SETTINGS
-from solar_time import CALCULATION_VERSION
 
 
 def _default(value: Any):
@@ -62,13 +61,12 @@ def _bool_value(value: Any, default: bool = False) -> bool:
         return False
     return default
 
-
 def canonical_profile_identity(profile_dict: dict[str, Any]) -> dict[str, Any]:
     """표시 이름과 입력 포맷 차이를 제거한 사람 단위 캐시 키.
 
-    같은 생년월일시/성별/달력/출생지/시간보정 방식이면 이름을 다르게 적어도 같은
-    원국 자료를 재사용한다. 경도 기반 보정을 적용하므로 대한민국도 도시가 캐시 키에
-    포함된다. 계산식이 바뀌었을 때 과거 결과를 잘못 재사용하지 않도록 버전도 보존한다.
+    같은 생년월일시/성별/달력/지역이면 이름을 다르게 적어도 같은 원국 자료를
+    재사용한다. 대한민국은 동일 표준시를 사용하므로 도시 입력을 키에 넣지 않는다.
+    출생시간 미상인 경우 내부 날짜변환용 12:00 값도 키에서 제외한다.
     """
     code = str(profile_dict.get('country_code') or 'KR').upper().strip()
     time_known = _bool_value(profile_dict.get('time_known'), True)
@@ -89,12 +87,11 @@ def canonical_profile_identity(profile_dict: dict[str, Any]) -> dict[str, Any]:
             else False
         ),
         'country_code': code,
-        'country': str(profile_dict.get('country') or '').strip().casefold(),
-        'city': str(profile_dict.get('city') or '').strip().casefold(),
-        'location_id': str(profile_dict.get('location_id') or '').strip(),
-        'solar_time_mode': str(profile_dict.get('solar_time_mode') or 'true_solar').strip().lower(),
-        'solar_time_version': CALCULATION_VERSION,
     }
+    if code != 'KR':
+        identity['country'] = str(profile_dict.get('country') or '').strip().casefold()
+        identity['city'] = str(profile_dict.get('city') or '').strip().casefold()
+        identity['location_id'] = str(profile_dict.get('location_id') or '').strip()
     return identity
 
 
