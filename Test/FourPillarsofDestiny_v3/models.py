@@ -20,14 +20,16 @@ class BirthProfile:
     minute: int
     time_known: bool = True
     is_leap_month: bool = False
-    # 사용자 화면에서는 도시 대신 국가를 기본으로 받습니다.
-    # 대한민국은 대표 위치값을 사용하고, 해외는 country + city로 실제 위치를 확인합니다.
+    # 출생지는 시주 시간 보정과 해외 시간대 확인에 사용합니다.
+    # 입력이 없던 과거 데이터는 기존 호환성을 위해 서울 대표 위치로 처리합니다.
     country_code: str = 'KR'
     country: str = '대한민국'
     city: str = ''
     location: str = '서울특별시, 대한민국'
     location_id: str = ''
     partner_gender: Gender = 'M'
+    # 계산식은 내부 기본값을 사용하되 향후 고급 설정을 열 수 있도록 명시적으로 보존합니다.
+    solar_time_mode: str = 'true_solar'
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -44,6 +46,8 @@ class Chart:
     stems: list[str]
     branches: list[str]
     element_percent_local: dict[str, float] = field(default_factory=dict)
+    # 원본 출생시각을 덮어쓰지 않고, 시간 보정 근거와 경계 경고를 함께 보존합니다.
+    time_correction: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
