@@ -73,6 +73,17 @@ class ForcetellerFacts:
     warnings: list[str] = field(default_factory=list)
     raw_source_path: str = ''
 
+    def __post_init__(self) -> None:
+        # 외부 원국을 우선 사용하더라도 사용자에게 보여줄 시간 보정 근거는 잃지 않습니다.
+        # 순환 import를 피하기 위해 인스턴스 생성 시점에만 로컬 계산기를 불러옵니다.
+        if self.profile.time_known and not self.chart.time_correction:
+            try:
+                from bazi_engine import calculate_chart
+                self.chart.time_correction = dict(calculate_chart(self.profile).time_correction)
+            except Exception:
+                # 보정 부가정보 실패가 기존 원국 해석 자체를 막아서는 안 됩니다.
+                pass
+
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
 
