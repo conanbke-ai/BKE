@@ -12,6 +12,7 @@ from constants import (
     CONTROLS,
 )
 from models import BirthProfile, Chart
+from solar_time import calculate_time_correction
 
 try:
     from lunar_python import Lunar, Solar
@@ -21,9 +22,13 @@ except ImportError as exc:  # pragma: no cover
     ) from exc
 
 
-def profile_to_solar(profile: BirthProfile) -> Solar:
+def _profile_to_civil_solar(profile: BirthProfile) -> Solar:
+    """사용자가 기록한 출생시각 그대로 양력 시각을 만든다.
+
+    음력 입력도 먼저 실제 양력 날짜로 바꾼 뒤 태양시 보정을 적용해야 균시차와
+    역사적 시간대가 올바른 달력 날짜를 기준으로 계산된다.
+    """
     # 시간 미상인 경우 정오를 날짜 변환용 안전 기준으로만 사용한다.
-    # calculate_chart()에서는 시주를 생성하지 않으므로 12:00을 실제 생시로 해석하지 않는다.
     hour = profile.hour if profile.time_known else 12
     minute = profile.minute if profile.time_known else 0
     if profile.calendar_type == 'solar':
@@ -37,8 +42,38 @@ def profile_to_solar(profile: BirthProfile) -> Solar:
     return lunar.getSolar()
 
 
+def _solar_datetime(solar: Solar) -> datetime:
+    return datetime(
+        solar.getYear(), solar.getMonth(), solar.getDay(),
+        solar.getHour(), solar.getMinute(), solar.getSecond(),
+    )
+
+
+def profile_to_solar_with_correction(profile: BirthProfile) -> tuple[Solar, dict]:
+    civil_solar = _profile_to_civil_solar(profile)
+    civil_datetime = _solar_datetime(civil_solar)
+    corrected, metadata = calculate_time_correction(
+        country_code=profile.country_code,
+        city=profile.city,
+        civil_datetime=civil_datetime,
+        time_known=profile.time_known,
+        mode=profile.solar_time_mode,
+    )
+    if not metadata.get('applied'):
+        return civil_solar, metadata
+    return Solar.fromYmdHms(
+        corrected.year, corrected.month, corrected.day,
+        corrected.hour, corrected.minute, corrected.second,
+    ), metadata
+
+
+def profile_to_solar(profile: BirthProfile) -> Solar:
+    solar, _ = profile_to_solar_with_correction(profile)
+    return solar
+
+
 def calculate_chart(profile: BirthProfile) -> Chart:
-    solar = profile_to_solar(profile)
+    solar, time_correction = profile_to_solar_with_correction(profile)
     eight = solar.getLunar().getEightChar()
     core_pillars = [eight.getYear(), eight.getMonth(), eight.getDay()]
     hour_pillar = eight.getTime() if profile.time_known else ''
@@ -62,6 +97,7 @@ def calculate_chart(profile: BirthProfile) -> Chart:
         stems=stems,
         branches=branches,
         element_percent_local=percent,
+        time_correction=time_correction,
     )
 
 
@@ -112,5 +148,3 @@ def period_pillars(moment: datetime) -> dict[str, str]:
         'day': eight.getDay(),
         'hour': eight.getTime(),
     }
-
-
