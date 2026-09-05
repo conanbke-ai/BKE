@@ -26,15 +26,16 @@ def country_name(code: str, fallback: str = '') -> str:
 def location_fields(country_code: str, country: str, city: str) -> tuple[str, str]:
     """사용자 입력을 내부 위치 검색 문자열로 바꿉니다.
 
-    대한민국은 사용자에게 시·군 입력을 받지 않고 대표 위치값을 사용합니다.
-    해외는 국가만으로 시간대가 확정되지 않는 국가가 많아 도시를 함께 받습니다.
-    실제 계산용 위치 ID는 수집 단계에서 검색 결과를 통해 확정됩니다.
+    출생지는 시주 시간 보정에 직접 사용되므로 대한민국도 도시를 보존합니다.
+    과거 저장 데이터처럼 도시가 비어 있는 대한민국 프로필은 호환성을 위해 서울을
+    대표값으로 사용하지만, 새 입력 화면에서는 도시를 받도록 구성합니다.
+    실제 외부 원국 서비스의 위치 ID는 수집 단계에서 검색 결과를 통해 확정됩니다.
     """
     code = (country_code or 'KR').upper()
     name = (country or country_name(code)).strip() or country_name(code)
     city = (city or '').strip()
-    if code == 'KR':
-        return '서울특별시, 대한민국', ''
+    if code == 'KR' and not city:
+        city = '서울특별시'
     if not city:
-        raise ValueError('해외 출생은 정확한 시간 기준을 위해 출생 도시를 입력해 주세요.')
+        raise ValueError('정확한 시간 기준을 위해 출생 도시를 입력해 주세요.')
     return f'{city}, {name}', ''
