@@ -1,2 +1,2 @@
 # Temporary CAS probe on this development branch only.
-# Replaced by the complete regression suite before review.
+# Writer A committed; a writer using the original SHA must be rejected.
