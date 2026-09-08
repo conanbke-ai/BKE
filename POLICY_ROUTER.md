@@ -5,6 +5,12 @@ Owner: TORI_COMMON
 
 이 파일은 규칙의 두 번째 사본이 아니라 조회 목차다. 세션·캐시·변경 적용 방식은 `TORI_POLICY_BOOTSTRAP.md`를 따른다. SHA와 읽은 범위가 동일하고 컨텍스트에 남아 있으면 재독하지 않는다.
 
+## 실행형 조정 도구 위치 — 2026-09-08
+
+Work Guard 구현은 [BKE PR #2](https://github.com/conanbke-ai/BKE/pull/2), `work/coordination-guard`의 `tools/work_guard/`에 있다. 사용·인계·복구는 해당 branch의 `docs/WORK_GUARD.md`, 실제 검증 범위는 `docs/WORK_GUARD_VALIDATION.md`를 읽는다. 같은 도구를 제품마다 새로 구현하지 않는다.
+
+현재 상태는 구현/로컬 81 tests PASS, 독립 검토·실 adapter 전체 확인·제품별 초기 전환 대기다. PR이 main에 들어오기 전 이미 전체 적용되었다고 가정하지 않는다. 기존 제품 작업은 그대로 유지하고, 검토 후 다음 정상 checkpoint에서 기존 작성자를 확인하여 init/HOLD/adopt한다. 새 Project Instructions 복사나 정책팩 업로드를 요구하지 않는다. 코드 수정자는 도구의 실제 실행과 CAS 성공을 확인해야 하며 plan만으로 예약됐다고 주장하지 않는다.
+
 ## 판단
 
 `STATUS / CHANGE_TAGS / RISK / CANONICAL / OWNER-LEASE / POLICY_BASELINE / VALIDATION`
