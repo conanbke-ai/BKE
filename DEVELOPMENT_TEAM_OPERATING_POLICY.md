@@ -1,5 +1,15 @@
 # Universal Development Team Operating Policy
 
+> 고정 정책 진입점 — 2026-09-08
+>
+> 기존 제품 `AGENTS.md`의 이 문서 참조를 그대로 사용한다. 세션 시작·정책 캐시·진행 중 작업의 적용 시점은 [TORI_POLICY_BOOTSTRAP.md](TORI_POLICY_BOOTSTRAP.md), 작업별 상세 조회는 [POLICY_ROUTER.md](POLICY_ROUTER.md)를 먼저 확인한다. 전체 본문을 매 요청마다 재독하지 않는다.
+>
+> 보안 상세는 [SECURITY_STANDARD.md](SECURITY_STANDARD.md), 기준 이후 변경은 [POLICY_CHANGELOG.md](POLICY_CHANGELOG.md), 연결/수신 확인은 [POLICY_VERSION_MATRIX.md](POLICY_VERSION_MATRIX.md)를 사용한다. 기존 더 엄격한 제품·보안 규칙은 유지한다.
+>
+> 아래 본문의 Preflight는 최신 상태 확인 의무이지 매번 전체 저장소·정책 재탐색 의무가 아니다. 같은 branch 재사용도 동시 쓰기 허용이 아니다. PR close/상태 변경만으로 branch 슬롯이 비지 않는다. 진행 중 작업은 일반 정책 변경 때문에 중단하지 않으며, 필요한 보안 gate와 실제 SHA 기반 검증은 생략하지 않는다.
+>
+> Project 파일/설정이나 실행 중인 다른 대화창이 자동 변경되는 것은 아니다. 다음 정상 checkpoint에서 기존 참조를 읽을 때 적용한다. 새 ZIP 재업로드나 Project Instructions 재복사는 이번 배포의 요구사항이 아니다.
+
 이 문서는 운토리, MYSTORI, 농토리 및 이후 생성되는 모든 개발 프로젝트에 공통 적용하는 팀 운영 정책이다. 여러 ChatGPT 대화창, Codex, 기타 개발 에이전트를 각각 독립된 팀원으로 간주하고, 동일 저장소를 병렬 작업할 때 중복 개발·브랜치 난립·충돌·회귀를 방지하는 것이 목적이다.
 
 ## 1. 역할 모델
